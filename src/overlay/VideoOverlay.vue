@@ -10,36 +10,66 @@
       <button class="close-button" @click="isRecentMatchStatsVisible = false" />
       <header />
       <div class="player-infos">
-        <div class="winner-icon"></div>
-        <div class="mmr-stats">
+        <div class="winner-icon">
+          <img
+            v-if="heroStats.won"
+            src="../assets/Crown_Indicator.png"
+            width="50"
+            height="50"
+            alt="winner"
+          />
+        </div>
+        <div class="mmr-stats" style="text-align: left;">
           <div>
-            {{ recentMatch.match.teams[0].players[0].currentMmr }} MMR ({{
-              recentMatch.match.teams[0].players[0].mmrGain
-            }})
+            {{ heroStats.oldMmr }} <span class="gray">MMR</span> (<span
+              :style="{
+                color:
+                  heroStats.mmrGain > 0
+                    ? 'var(--color-green)'
+                    : 'var(--color-red)'
+              }"
+              >{{ heroStats.mmrGain > 0 ? "+" : ""
+              }}{{ heroStats.mmrGain }}</span
+            >)
           </div>
         </div>
-        <div class="player-name">
-          {{ recentMatch.match.teams[0].players[0].name }}
+        <div class="player-name" style="text-align: right;">
+          {{ heroStats.name }}
         </div>
         <div class="race-icon"></div>
         <div>VS</div>
         <div class="race-icon"></div>
-        <div class="player-name">
-          {{ recentMatch.match.teams[1].players[0].name }}
+        <div class="player-name" style="text-align: left;">
+          {{ opponentStats.name }}
         </div>
-        <div class="mmr-stats">
+        <div class="mmr-stats" style="text-align: right;">
           <div>
-            {{ recentMatch.match.teams[1].players[0].currentMmr }} MMR ({{
-              recentMatch.match.teams[1].players[0].mmrGain
-            }})
+            {{ opponentStats.oldMmr }} <span class="gray">MMR</span> (<span
+              :style="{
+                color:
+                  opponentStats.mmrGain > 0
+                    ? 'var(--color-green)'
+                    : 'var(--color-red)'
+              }"
+              >{{ opponentStats.mmrGain > 0 ? "+" : ""
+              }}{{ opponentStats.mmrGain }}</span
+            >)
           </div>
         </div>
-        <div class="winner-icon"></div>
+        <div class="winner-icon">
+          <img
+            v-if="opponentStats.won"
+            src="../assets/Crown_Indicator.png"
+            width="50"
+            height="50"
+            alt="winner"
+          />
+        </div>
       </div>
       <div class="stats-container">
         <div class="heroes-stats">
           <div
-            v-for="hero in recentMatch.playerScores[0].heroes"
+            v-for="hero in heroScores.heroes"
             :key="hero.icon"
             class="hero-icon"
           >
@@ -53,57 +83,72 @@
           </div>
         </div>
         <div class="game-stats">
-          <div>{{ recentMatch.playerScores[0].heroScore.heroesKilled }}</div>
-          <div>Heroes killed</div>
-          <div>{{ recentMatch.playerScores[1].heroScore.heroesKilled }}</div>
-
-          <div>{{ recentMatch.playerScores[0].heroScore.expGained }}</div>
-          <div>Experience gained</div>
-          <div>{{ recentMatch.playerScores[1].heroScore.expGained }}</div>
-
-          <div>{{ recentMatch.playerScores[0].heroScore.itemsObtained }}</div>
-          <div>Items collected</div>
-          <div>{{ recentMatch.playerScores[1].heroScore.itemsObtained }}</div>
-
-          <div>114</div>
-          <div>Units killed</div>
-          <div>43</div>
-
-          <div>{{ recentMatch.playerScores[0].unitScore.unitsProduced }}</div>
-          <div>Units produced</div>
-          <div>{{ recentMatch.playerScores[1].unitScore.unitsProduced }}</div>
-
-          <div>{{ recentMatch.playerScores[0].unitScore.largestArmy }}</div>
-          <div>Largest army</div>
-          <div>{{ recentMatch.playerScores[1].unitScore.largestArmy }}</div>
-
-          <div>
-            {{ recentMatch.playerScores[0].resourceScore.goldCollected }}
-          </div>
-          <div>Gold mined</div>
-          <div>
-            {{ recentMatch.playerScores[1].resourceScore.goldCollected }}
+          <div class="game-stats-section">
+            <ScoreStatRow
+              title="Heroes killed"
+              icon="kills"
+              :stat1="heroScores.heroScore.heroesKilled"
+              :stat2="opponentScores.heroScore.heroesKilled"
+            />
+            <ScoreStatRow
+              title="Experience gained"
+              icon="plus"
+              :stat1="heroScores.heroScore.expGained"
+              :stat2="opponentScores.heroScore.expGained"
+            />
+            <ScoreStatRow
+              title="Items collected"
+              icon="items"
+              :stat1="heroScores.heroScore.itemsObtained"
+              :stat2="opponentScores.heroScore.itemsObtained"
+            />
           </div>
 
-          <div>
-            {{ recentMatch.playerScores[0].resourceScore.lumberCollected }}
-          </div>
-          <div>Lumber harvested</div>
-          <div>
-            {{ recentMatch.playerScores[1].resourceScore.lumberCollected }}
+          <div class="game-stats-section">
+            <ScoreStatRow
+              title="Units killed"
+              icon="kills"
+              :stat1="heroScores.unitScore.unitsKilled"
+              :stat2="opponentScores.unitScore.unitsKilled"
+            />
+            <ScoreStatRow
+              title="Units produced"
+              icon="supply"
+              :stat1="heroScores.unitScore.unitsProduced"
+              :stat2="opponentScores.unitScore.unitsProduced"
+            />
+            <ScoreStatRow
+              title="Largest army"
+              icon="supply"
+              :stat1="heroScores.unitScore.largestArmy"
+              :stat2="opponentScores.unitScore.largestArmy"
+            />
           </div>
 
-          <div>
-            {{ recentMatch.playerScores[0].resourceScore.goldUpkeepLost }}
-          </div>
-          <div>Upkeep lost</div>
-          <div>
-            {{ recentMatch.playerScores[1].resourceScore.goldUpkeepLost }}
+          <div class="game-stats-section">
+            <ScoreStatRow
+              title="Gold mined"
+              icon="gold"
+              :stat1="heroScores.resourceScore.goldCollected"
+              :stat2="opponentScores.resourceScore.goldCollected"
+            />
+            <ScoreStatRow
+              title="Lumber harvested"
+              icon="lumber"
+              :stat1="heroScores.resourceScore.lumberCollected"
+              :stat2="opponentScores.resourceScore.lumberCollected"
+            />
+            <ScoreStatRow
+              title="Upkeep lost"
+              icon="gold"
+              :stat1="heroScores.resourceScore.goldUpkeepLost"
+              :stat2="opponentScores.resourceScore.goldUpkeepLost"
+            />
           </div>
         </div>
         <div class="heroes-stats">
           <div
-            v-for="hero in recentMatch.playerScores[1].heroes"
+            v-for="hero in opponentScores.heroes"
             :key="hero.icon"
             class="hero-icon"
           >
@@ -124,7 +169,8 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { EGameMode, Match, MatchDetail } from "@/typings";
+import { Match, MatchDetail, PlayerInTeam, PlayerScore } from "@/typings";
+import ScoreStatRow from "@/components/ScoreStat.vue";
 
 interface ComponentData {
   battleTag: string;
@@ -169,6 +215,7 @@ function getAsset(path: string) {
 
 export default defineComponent({
   name: "VideoOverlay",
+  components: { ScoreStatRow },
   data(): ComponentData {
     return {
       battleTag: "",
@@ -182,10 +229,44 @@ export default defineComponent({
     };
   },
   computed: {
-    meleeMatches(): Match[] {
-      return this.matchHistory.matches.filter(
-        (match: Match) => match.gameMode === EGameMode.GM_1ON1
-      );
+    heroStats(): PlayerInTeam {
+      let heroPlayer;
+
+      for (const team of (this.recentMatch as MatchDetail).match.teams) {
+        for (const player of team.players) {
+          if (player.battleTag === this.battleTag) {
+            heroPlayer = player;
+            break;
+          }
+        }
+      }
+
+      return heroPlayer as PlayerInTeam;
+    },
+    heroScores(): PlayerScore {
+      // todo: check for non empty recent match here
+      return (this.recentMatch as MatchDetail).playerScores.find(
+        score => score.battleTag === this.battleTag
+      )!;
+    },
+    opponentStats(): PlayerInTeam {
+      let opponentPlayer;
+
+      for (const team of (this.recentMatch as MatchDetail).match.teams) {
+        for (const player of team.players) {
+          if (player.battleTag !== this.battleTag) {
+            opponentPlayer = player;
+            break;
+          }
+        }
+      }
+
+      return opponentPlayer as PlayerInTeam;
+    },
+    opponentScores(): PlayerScore {
+      return (this.recentMatch as MatchDetail).playerScores.find(
+        score => score.battleTag !== this.battleTag
+      )!;
     }
   },
   mounted() {
@@ -204,7 +285,7 @@ export default defineComponent({
     async fetchRecentMatches() {
       if (this.battleTag) {
         const encodedBattleTag = encodeURIComponent(this.battleTag);
-        const url = `https://statistic-service.w3champions.com/api/matches/search?playerId=${encodedBattleTag}&gateway=20&offset=0&pageSize=10&season=5`;
+        const url = `https://statistic-service.w3champions.com/api/matches/search?playerId=${encodedBattleTag}&gateway=20&offset=0&pageSize=1&season=5`;
 
         const response = await fetch(url);
         this.matchHistory = await response.json();
@@ -224,13 +305,24 @@ export default defineComponent({
 });
 </script>
 
-<style scoped lang="scss">
+<style lang="scss">
+html {
+  --color-yellow: #ffe033;
+  --color-green: #34c264;
+  --color-red: #bf301f;
+  --color-gray: #83817e;
+}
+
 * {
   box-sizing: border-box;
 }
 
+.gray {
+  color: var(--color-gray);
+}
+
 .stats-toggler {
-  color: #fede32;
+  color: var(--color-yellow);
   position: fixed;
   top: 0;
   left: 0;
@@ -283,6 +375,7 @@ export default defineComponent({
 .player-infos {
   display: grid;
   grid-template-columns: 50px 150px 1fr 50px 50px 50px 1fr 150px 50px;
+  grid-template-rows: 50px;
   align-items: center;
   grid-column-gap: 10px;
 }
@@ -291,11 +384,6 @@ export default defineComponent({
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-column-gap: 12px;
-}
-
-.game-stats {
-  display: grid;
-  grid-template-columns: 25% 50% 25%;
 }
 
 .close-button {
@@ -375,5 +463,24 @@ export default defineComponent({
   width: 15px;
   display: block;
   font-size: 10px;
+}
+
+.player-name {
+  color: var(--color-yellow);
+  font-weight: bold;
+  font-size: 28px;
+}
+
+.winner-icon {
+  img {
+    transform: rotate(30deg);
+  }
+}
+
+.game-stats-section {
+  margin-bottom: 25px;
+  display: grid;
+  grid-auto-flow: row;
+  grid-row-gap: 5px;
 }
 </style>
