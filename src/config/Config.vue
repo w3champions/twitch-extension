@@ -1,35 +1,31 @@
 <template>
   <form @submit.prevent="saveSettings" class="form">
     <div>
-      <label for="gateway">
-        Gateway:
-        <select name="gateway" id="gateway" v-model="gateway">
-          <option value="1">Europe</option>
-          <option value="2">NA</option>
-          <option value="4">Asia</option>
-        </select>
-      </label>
-    </div>
-    <div>
       <label for="battleTag">
         Battle Tag:
         <input
           type="text"
           id="battleTag"
           v-model="battleTag"
-          placeholder="cacxa#2727"
+          placeholder="BattleTag#1234"
         />
       </label>
     </div>
     <div>
       <button type="submit">Save config</button>
     </div>
+    <p v-if="saved" style="color: green">Battletag saved!</p>
   </form>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 import { Segment } from "@/typings";
+
+interface ComponentData {
+  battleTag: string;
+  saved: boolean;
+}
 
 export default defineComponent({
   name: "Config",
@@ -45,20 +41,24 @@ export default defineComponent({
       }
     });
   },
-  data() {
+  data(): ComponentData {
     return {
-      gateway: null,
-      battleTag: ""
+      battleTag: "",
+      saved: false
     };
   },
   methods: {
     saveSettings() {
       const content = JSON.stringify({
-        battleTag: this.battleTag,
-        gateway: this.gateway
+        battleTag: this.battleTag
       });
-      window.Twitch.ext.rig.log(Segment.Broadcaster);
       window.Twitch.ext.configuration.set(Segment.Broadcaster, "", content);
+
+      this.saved = true;
+
+      setTimeout(() => {
+        this.saved = false;
+      }, 4000);
     }
   }
 });
@@ -66,6 +66,7 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .form {
+  background: white;
   display: grid;
   grid-auto-flow: row;
   grid-row-gap: 16px;
