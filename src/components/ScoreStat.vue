@@ -79,9 +79,10 @@ export default defineComponent({
 .score-stat-row {
   display: grid;
   grid-template-areas: "stat1" "icon1" "title" "icon2" "stat2";
-  grid-template-columns: 1fr 16px 125px 16px 1fr;
+  grid-template-columns: 1fr 16px 135px 16px 1fr;
   grid-template-rows: 16px;
   grid-column-gap: 10px;
+  line-height: 1;
 
   &--reverse {
     grid-template-areas: "icon" "stat";

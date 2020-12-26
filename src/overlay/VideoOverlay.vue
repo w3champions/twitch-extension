@@ -8,14 +8,7 @@
       class="container"
     >
       <button class="close-button" @click="isRecentMatchStatsVisible = false" />
-      <header>
-        <span
-          :style="{
-            color: heroStats.won ? 'var(--color-green)' : 'var(--color-red)'
-          }"
-          >{{ heroStats.won ? "Victory" : "Defeat" }}</span
-        >
-      </header>
+      <header />
       <div class="player-infos">
         <div class="winner-icon">
           <img
@@ -169,8 +162,18 @@
           </div>
         </div>
         <div class="map-stats">
-          <div class="map"></div>
-          {{ mapNames[recentMatch.match.map] }}
+          <div style="text-align: right">
+            Map:<br />
+            {{ mapNames[recentMatch.match.map] }}
+          </div>
+          <div class="map">
+            <img :src="getMinimap(recentMatch.match.map)" alt="minimap" />
+            <div class="minimap-overlay"></div>
+          </div>
+          <div style="text-align: left">
+            Duration:<br />
+            {{ gameDuration }}
+          </div>
         </div>
       </div>
     </div>
@@ -181,6 +184,8 @@
 import { defineComponent } from "vue";
 import { Match, MatchDetail, PlayerInTeam, PlayerScore } from "@/typings";
 import ScoreStatRow from "@/components/ScoreStat.vue";
+import formatDuration from "date-fns/formatDuration";
+import intervalToDuration from "date-fns/intervalToDuration";
 
 interface ComponentData {
   battleTag: string;
@@ -397,6 +402,14 @@ export default defineComponent({
       return (this.recentMatch as MatchDetail).playerScores.find(
         score => score.battleTag !== this.battleTag
       )!;
+    },
+    gameDuration(): string {
+      return formatDuration(
+        intervalToDuration({
+          start: 0,
+          end: (this.recentMatch as MatchDetail).match.durationInSeconds * 1000
+        })
+      );
     }
   },
   watch: {
@@ -434,6 +447,9 @@ export default defineComponent({
     },
     getHeroIcon(hero: string) {
       return getAsset(`heroes/${hero}.png`);
+    },
+    getMinimap(map: string) {
+      return getAsset(`maps/${map}.png`);
     }
   }
 });
@@ -445,6 +461,8 @@ html {
   --color-green: #34c264;
   --color-red: #bf301f;
   --color-gray: #83817e;
+
+  font-family: "Spectral", serif;
 }
 
 * {
@@ -517,7 +535,7 @@ html {
 .stats-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: 1fr 140px;
+  grid-template-rows: 1fr 150px;
   grid-column-gap: 12px;
   grid-row-gap: 20px;
 }
@@ -615,7 +633,7 @@ html {
 }
 
 .game-stats-section {
-  margin-bottom: 25px;
+  margin-bottom: 15px;
   display: grid;
   grid-auto-flow: row;
   grid-row-gap: 5px;
@@ -627,12 +645,33 @@ html {
 
 .map-stats {
   grid-column: 1/4;
+  display: grid;
+  grid-template-columns: 1fr 135px 1fr;
+  grid-column-gap: 12px;
 }
 
 .map {
+  grid-column: 2;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 135px;
+  height: 137px;
+  margin: 0 auto;
+
+  img {
+    width: 135px;
+  }
+}
+
+.minimap-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
   background-image: url("../assets/Map_Frame.png");
   background-size: contain;
-  width: 140px;
-  height: 140px;
+  width: 135px;
+  height: 137px;
 }
 </style>
