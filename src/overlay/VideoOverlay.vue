@@ -1,178 +1,205 @@
 <template>
-  <button class="stats-toggler" @click="isRecentMatchStatsVisible = true">
+  <w-button class="overlay-toggle" @click="isRecentMatchStatsVisible = true">
     W3C
-  </button>
+  </w-button>
   <transition name="slide">
-    <div
-      v-if="isRecentMatchStatsVisible && recentMatch.match"
-      class="container"
-    >
+    <div v-if="isRecentMatchStatsVisible" class="container">
       <button class="close-button" @click="isRecentMatchStatsVisible = false" />
-      <header />
-      <div class="player-infos">
-        <div class="winner-icon">
-          <img
-            v-if="heroStats.won"
-            src="../assets/Crown_Indicator.png"
-            width="50"
-            height="50"
-            alt="winner"
-          />
+      <header class="header">
+        <div class="promo">Welcome to W3C</div>
+        <div class="header-tabs">
+          <w-button
+            v-for="tab in tabs"
+            :key="tab"
+            :is-active="currentTab === tab"
+            @click="currentTab = tab"
+            >{{ tabNames[tab] }}</w-button
+          >
         </div>
-        <div class="mmr-stats" style="text-align: left;">
-          <div>
-            {{ heroStats.oldMmr }} <span class="gray">MMR</span> (<span
-              :style="{
-                color:
-                  heroStats.mmrGain > 0
-                    ? 'var(--color-green)'
-                    : 'var(--color-red)'
-              }"
-              >{{ heroStats.mmrGain > 0 ? "+" : ""
-              }}{{ heroStats.mmrGain }}</span
-            >)
-          </div>
-        </div>
-        <div class="player-name" style="text-align: right;">
-          {{ heroStats.name }}
-        </div>
-        <div class="race-icon"></div>
-        <div>VS</div>
-        <div class="race-icon"></div>
-        <div class="player-name" style="text-align: left;">
-          {{ opponentStats.name }}
-        </div>
-        <div class="mmr-stats" style="text-align: right;">
-          <div>
-            {{ opponentStats.oldMmr }} <span class="gray">MMR</span> (<span
-              :style="{
-                color:
-                  opponentStats.mmrGain > 0
-                    ? 'var(--color-green)'
-                    : 'var(--color-red)'
-              }"
-              >{{ opponentStats.mmrGain > 0 ? "+" : ""
-              }}{{ opponentStats.mmrGain }}</span
-            >)
-          </div>
-        </div>
-        <div class="winner-icon">
-          <img
-            v-if="opponentStats.won"
-            src="../assets/Crown_Indicator.png"
-            width="50"
-            height="50"
-            alt="winner"
-          />
-        </div>
+      </header>
+      <div v-if="currentTab === 'currentMatch' && currentMatch.data.id">
+        {{
+          getWinProbability(
+            currentMatch.data.teams[0].players[0].oldMmr,
+            currentMatch.data.teams[1].players[0].oldMmr
+          )
+        }}% {{ currentMatch.data.teams[0].players[0].name }} -
+        {{ currentMatch.data.teams[0].players[0].oldMmr }}
+        {{ currentMatch.data.teams[1].players[0].name }} -
+        {{ currentMatch.data.teams[1].players[0].oldMmr }}
       </div>
-      <div class="stats-container">
-        <div class="heroes-stats" style="justify-content: flex-end;">
-          <div
-            v-for="hero in heroScores.heroes"
-            :key="hero.icon"
-            class="hero-icon"
-          >
+      <div
+        v-if="currentTab === 'recentMatch' && recentMatch.data.match"
+        class="tab-area"
+      >
+        <div class="player-infos">
+          <div class="winner-icon">
             <img
-              :src="getHeroIcon(hero.icon)"
-              width="48"
-              height="48"
-              :alt="heroNames[hero.icon]"
-            />
-            <span class="hero-level"> {{ hero.level }} </span>
-          </div>
-        </div>
-        <div class="game-stats">
-          <div class="game-stats-section">
-            <ScoreStatRow
-              title="Heroes killed"
-              icon="kills"
-              :stat1="heroScores.heroScore.heroesKilled"
-              :stat2="opponentScores.heroScore.heroesKilled"
-            />
-            <ScoreStatRow
-              title="Experience gained"
-              icon="plus"
-              :stat1="heroScores.heroScore.expGained"
-              :stat2="opponentScores.heroScore.expGained"
-            />
-            <ScoreStatRow
-              title="Items collected"
-              icon="items"
-              :stat1="heroScores.heroScore.itemsObtained"
-              :stat2="opponentScores.heroScore.itemsObtained"
+              v-if="heroStats.won"
+              src="../assets/Crown_Indicator.png"
+              width="50"
+              height="50"
+              alt="winner"
             />
           </div>
-
-          <div class="game-stats-section">
-            <ScoreStatRow
-              title="Units killed"
-              icon="kills"
-              :stat1="heroScores.unitScore.unitsKilled"
-              :stat2="opponentScores.unitScore.unitsKilled"
-            />
-            <ScoreStatRow
-              title="Units produced"
-              icon="supply"
-              :stat1="heroScores.unitScore.unitsProduced"
-              :stat2="opponentScores.unitScore.unitsProduced"
-            />
-            <ScoreStatRow
-              title="Largest army"
-              icon="supply"
-              :stat1="heroScores.unitScore.largestArmy"
-              :stat2="opponentScores.unitScore.largestArmy"
-            />
+          <div class="mmr-stats" style="text-align: left;">
+            <div>
+              {{ heroStats.oldMmr }} <span class="gray">MMR</span> (<span
+                :style="{
+                  color:
+                    heroStats.mmrGain > 0
+                      ? 'var(--color-green)'
+                      : 'var(--color-red)'
+                }"
+                >{{ heroStats.mmrGain > 0 ? "+" : ""
+                }}{{ heroStats.mmrGain }}</span
+              >)
+            </div>
           </div>
-
-          <div class="game-stats-section">
-            <ScoreStatRow
-              title="Gold mined"
-              icon="gold"
-              :stat1="heroScores.resourceScore.goldCollected"
-              :stat2="opponentScores.resourceScore.goldCollected"
-            />
-            <ScoreStatRow
-              title="Lumber harvested"
-              icon="lumber"
-              :stat1="heroScores.resourceScore.lumberCollected"
-              :stat2="opponentScores.resourceScore.lumberCollected"
-            />
-            <ScoreStatRow
-              title="Upkeep lost"
-              icon="gold"
-              :stat1="heroScores.resourceScore.goldUpkeepLost"
-              :stat2="opponentScores.resourceScore.goldUpkeepLost"
-            />
+          <div class="player-name" style="text-align: right;">
+            {{ heroStats.name }}
           </div>
-        </div>
-        <div class="heroes-stats">
-          <div
-            v-for="hero in opponentScores.heroes"
-            :key="hero.icon"
-            class="hero-icon"
-          >
+          <div class="race-icon"></div>
+          <div>VS</div>
+          <div class="race-icon"></div>
+          <div class="player-name" style="text-align: left;">
+            {{ opponentStats.name }}
+          </div>
+          <div class="mmr-stats" style="text-align: right;">
+            <div>
+              {{ opponentStats.oldMmr }} <span class="gray">MMR</span> (<span
+                :style="{
+                  color:
+                    opponentStats.mmrGain > 0
+                      ? 'var(--color-green)'
+                      : 'var(--color-red)'
+                }"
+                >{{ opponentStats.mmrGain > 0 ? "+" : ""
+                }}{{ opponentStats.mmrGain }}</span
+              >)
+            </div>
+          </div>
+          <div class="winner-icon">
             <img
-              :src="getHeroIcon(hero.icon)"
-              width="48"
-              height="48"
-              :alt="heroNames[hero.icon]"
+              v-if="opponentStats.won"
+              src="../assets/Crown_Indicator.png"
+              width="50"
+              height="50"
+              alt="winner"
             />
-            <span class="hero-level"> {{ hero.level }} </span>
           </div>
         </div>
-        <div class="map-stats">
-          <div style="text-align: right">
-            Map:<br />
-            {{ mapNames[recentMatch.match.map] }}
+        <div class="stats-container">
+          <div class="heroes-stats" style="justify-content: flex-end;">
+            <div
+              v-for="hero in heroScores.heroes"
+              :key="hero.icon"
+              class="hero-icon"
+            >
+              <img
+                :src="getHeroIcon(hero.icon)"
+                width="48"
+                height="48"
+                :alt="heroNames[hero.icon]"
+              />
+              <span class="hero-level"> {{ hero.level }} </span>
+            </div>
           </div>
-          <div class="map">
-            <img :src="getMinimap(recentMatch.match.map)" alt="minimap" />
-            <div class="minimap-overlay"></div>
+          <div class="game-stats">
+            <div class="game-stats-section">
+              <ScoreStatRow
+                title="Heroes killed"
+                icon="kills"
+                :stat1="heroScores.heroScore.heroesKilled"
+                :stat2="opponentScores.heroScore.heroesKilled"
+              />
+              <ScoreStatRow
+                title="Experience gained"
+                icon="plus"
+                :stat1="heroScores.heroScore.expGained"
+                :stat2="opponentScores.heroScore.expGained"
+              />
+              <ScoreStatRow
+                title="Items collected"
+                icon="items"
+                :stat1="heroScores.heroScore.itemsObtained"
+                :stat2="opponentScores.heroScore.itemsObtained"
+              />
+            </div>
+
+            <div class="game-stats-section">
+              <ScoreStatRow
+                title="Units killed"
+                icon="kills"
+                :stat1="heroScores.unitScore.unitsKilled"
+                :stat2="opponentScores.unitScore.unitsKilled"
+              />
+              <ScoreStatRow
+                title="Units produced"
+                icon="supply"
+                :stat1="heroScores.unitScore.unitsProduced"
+                :stat2="opponentScores.unitScore.unitsProduced"
+              />
+              <ScoreStatRow
+                title="Largest army"
+                icon="supply"
+                :stat1="heroScores.unitScore.largestArmy"
+                :stat2="opponentScores.unitScore.largestArmy"
+              />
+            </div>
+
+            <div class="game-stats-section">
+              <ScoreStatRow
+                title="Gold mined"
+                icon="gold"
+                :stat1="heroScores.resourceScore.goldCollected"
+                :stat2="opponentScores.resourceScore.goldCollected"
+              />
+              <ScoreStatRow
+                title="Lumber harvested"
+                icon="lumber"
+                :stat1="heroScores.resourceScore.lumberCollected"
+                :stat2="opponentScores.resourceScore.lumberCollected"
+              />
+              <ScoreStatRow
+                title="Upkeep lost"
+                icon="gold"
+                :stat1="heroScores.resourceScore.goldUpkeepLost"
+                :stat2="opponentScores.resourceScore.goldUpkeepLost"
+              />
+            </div>
           </div>
-          <div style="text-align: left">
-            Duration:<br />
-            {{ gameDuration }}
+          <div class="heroes-stats">
+            <div
+              v-for="hero in opponentScores.heroes"
+              :key="hero.icon"
+              class="hero-icon"
+            >
+              <img
+                :src="getHeroIcon(hero.icon)"
+                width="48"
+                height="48"
+                :alt="heroNames[hero.icon]"
+              />
+              <span class="hero-level"> {{ hero.level }} </span>
+            </div>
+          </div>
+          <div class="map-stats">
+            <div style="text-align: right">
+              Map:<br />
+              {{ mapNames[recentMatch.data.match.map] }}
+            </div>
+            <div class="map">
+              <img
+                :src="getMinimap(recentMatch.data.match.map)"
+                alt="minimap"
+              />
+              <div class="minimap-overlay"></div>
+            </div>
+            <div style="text-align: left">
+              Duration:<br />
+              {{ gameDuration }}
+            </div>
           </div>
         </div>
       </div>
@@ -181,276 +208,185 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { Match, MatchDetail, PlayerInTeam, PlayerScore } from "@/typings";
+import {
+  computed,
+  defineComponent,
+  onMounted,
+  reactive,
+  ref,
+  watch
+} from "vue";
 import ScoreStatRow from "@/components/ScoreStat.vue";
 import formatDuration from "date-fns/formatDuration";
 import intervalToDuration from "date-fns/intervalToDuration";
+import WButton from "@/components/common/WButton.vue";
+import { heroNames, mapNames } from "@/constants/constants";
+import { Match, MatchDetail } from "@/typings";
 
-interface ComponentData {
-  battleTag: string;
-  matchHistory: { count: number; matches: Array<Match> };
-  isRecentMatchStatsVisible: boolean;
-  recentMatch: MatchDetail;
-  heroNames: Record<string, string>;
-  mapNames: Record<string, string>;
+enum Tabs {
+  CURRENT_MATCH = "currentMatch",
+  RECENT_MATCH = "recentMatch"
 }
-
-const heroNames = {
-  all: "Any hero selection",
-  none: "No hero selection",
-  archmage: "Archmage",
-  alchemist: "Goblin Alchemist",
-  avatarofflame: "Firelord",
-  bansheeranger: "Dark Ranger",
-  beastmaster: "Beastmaster",
-  blademaster: "Blademaster",
-  cryptlord: "Crypt Lord",
-  deathknight: "Death Knight",
-  demonhunter: "Demon Hunter",
-  dreadlord: "Dread Lord",
-  farseer: "Farseer",
-  keeperofthegrove: "Keeper of the Grove",
-  lich: "Lich",
-  mountainking: "Mountain King",
-  paladin: "Paladin",
-  pandarenbrewmaster: "Pandaren Brewmaster",
-  pitlord: "Pit Lord",
-  priestessofthemoon: "Priestress of the Moon",
-  seawitch: "Naga Sea Witch",
-  shadowhunter: "Shadow Hunter",
-  sorceror: "Bloodmage",
-  taurenchieftain: "Tauren Chieftain",
-  tinker: "Goblin Tinker",
-  warden: "Warden"
-};
-/* eslint-disable @typescript-eslint/camelcase */
-const mapNames = {
-  Overall: "Overall",
-  twistedmeadows: "Twisted Meadows",
-  echoisles: "Echo Isles",
-  lastrefuge: "Last Refuge",
-  northernisles: "Northern Isles",
-  concealedhill: "Concealed Hill",
-  terenasstand: "Terenas Stand LV",
-  amazonia: "Amazonia",
-  avalanche: "Avalanche LV",
-  goldshire: "Goldshire",
-  gnollwood: "Gnoll Wood",
-  turtlerock: "Turtle Rock",
-  losttemple: "Lost Temple LV",
-  hillsbradcreek: "Hillsbrad Creek",
-  autumnleaves: "Autumn Leaves",
-  _1v1_autumnleaves_anon: "Autumn Leaves",
-  _ffa_marketsquare_anon: "Market Square",
-  _ffa_marketsquare_anon_cd: "Market Square",
-  deathrose: "Deathrose",
-  _ffa_deathrose_anon: "Deathrose",
-  _ffa_deathrose_anon_cd: "Deathrose",
-  fountainofmanipulation: "Fountain Of Manipulation",
-  _ffa_fountainofmanipulation_anon: "Fountain Of Manipulation",
-  _ffa_fountainofmanipulation_anon_cd: "Fountain Of Manipulation",
-  anarchycastle: "Anarchy Castle",
-  _ffa_anarchycastle_anon: "Anarchy Castle",
-  _ffa_anarchycastle_anon_cd: "Anarchy Castle",
-  silverpineforest: "Silverpine Forest",
-  _ffa_silverpineforest_anon: "Silverpine Forest",
-  _ffa_silverpineforest_anon_cd: "Silverpine Forest",
-  neoncity: "Neon City",
-  _ffa_neoncity_anon: "Neon City",
-  _ffa_neoncity_anon_cd: "Neon City",
-  harvestofsorrow: "Harvest Of Sorrow",
-  _ffa_harvestofsorrow_anon: "Harvest Of Sorrow",
-  _ffa_harvestofsorrow_anon_cd: "Harvest Of Sorrow",
-  _ffa_twilightruins_anon: "Twilight Ruins",
-  _ffa_twilightruins_anon_cd: "Twilight Ruins",
-  "deadlock lv": "Deadlock LV",
-  "_ffa_deadlock lv_anon": "Deadlock LV",
-  "_ffa_deadlock lv_anon_cd": "Deadlock LV",
-  "_ffa_sanctuary lv_anon": "Sanctuary LV",
-  "_ffa_sanctuary lv_anon_cd": "Sanctuary LV",
-  rockslide: "Rockslide",
-  _ffa_rockslide_anon: "Rockslide",
-  _ffa_rockslide_anon_cd: "Rockslide",
-  ferocity: "Ferocity",
-  _ffa_ferocity_anon: "Ferocity",
-  _ffa_ferocity_anon_cd: "Ferocity",
-  frozenmarshlands: "Frozen Marshlands",
-  _ffa_frozenmarshlands_anon: "Frozen Marshlands",
-  _ffa_frozenmarshlands_anon_cd: "Frozen Marshlands",
-  circleoffallenheroes: "Circle of Fallen Heroes",
-  tidewaterglades: "Tidewater Glades LV",
-  goldrush: "Gold Rush",
-  feralas: "Feralas LV",
-  murguloasis: "Mur'Gul Oasis LV",
-  deadlock: "Deadlock LV",
-  sanctuary: "Sanctuary LV",
-  tatsascastlegardens: "Tastas Castle Gardens",
-  nerubianpassage: "Nerubian Passage",
-  battleground: "Battleground",
-  northshire: "Northshire LV",
-  twilightruins: "Twilight Ruins LV",
-  northernfelwood: "Northern Felwood",
-  marketsquare: "Market Square",
-  golemsinthemist: "Golems in the Mist",
-  cherryville: "Cherryville",
-  dragonfalls: "Dragon Falls",
-  fullscaleassault: "Full Scale Assault",
-  _1v1_terenasstand_anon: "Terenas Stand",
-  _1v1_lastrefuge_anon: "Last Refuge",
-  _1v1_northernisles_anon: "Northern Isles",
-  _1v1_amazonia_anon: "Amazonia",
-  _1v1_echoisles_anon: "Echo Isles",
-  _1v1_concealedhill_anon: "Concealed Hill",
-  _1v1_twistedmeadows_anon: "Twisted Meadows",
-  _gnollwood_anon: "Gnoll Wood",
-  _avalanche_anon: "Avalanche",
-  _battlegrounds_anon: "Battleground",
-  _cherryville_anon: "Cherryville",
-  _circleoffallenheroes_anon: "Circle of Fallen Heroes",
-  _deadlock_lv_anon: "Deadlock LV",
-  _feralas_lv_anon: "Feralas LV",
-  _fullscaleassault_anon: "Full Scale Assault",
-  _goldrush_anon: "Goldrush",
-  _goldshire_anon: "Goldshire",
-  _goleminthemist_lv_anon: "Golems in the Mist LV",
-  _hillsbradcreek_anon: "Hillsbrad Creek",
-  _losttemple_lv_anon: "Lost Temple LV",
-  _marketsquare_anon: "Market Square",
-  "_mur'galoasis_lv_anon": "Mur'gal Oasis LV",
-  _nerubianpassage_anon: "Nerubian Passage",
-  _northernfelwood_anon: "Northern Felwood",
-  _northshire_lv_anon: "Northshire LV",
-  _sanctuary_lv_anon: "Sanctuary LV",
-  "sanctuary lv": "Sanctuary LV",
-  _tidewaterglades_lv_anon: "Tidewater Glades LV",
-  _tidewaterglades_anon: "Tidewater Glades LV",
-  _turtlerock_anon: "Turtle Rock",
-  _twilightruins_lv_anon: "Twilight Ruins LV",
-  _twilightruins_anon: "Twilight Ruins",
-  vilereef: "Vile Reef",
-  dalarangarden: "Dalaran Garden",
-  phantomgrovew3c: "Phantom Grove W3C",
-  tidewatergladesw3c: "Tidewater Glades W3C",
-  autumnleaves201016: "Autumn Leaves",
-  ruinsofazshara201016: "Ruins of Azshara LV",
-  phantomgrovew3c201016: "Phantom Grove W3C",
-  vilereef201016: "Vile Reef",
-  wellspringtemple201016: "Wellspring Temple",
-  ferocity201016: "Ferocity",
-  synergyw3c: "Synergy",
-  featherville: "Featherville"
-};
-/* eslint-enable @typescript-eslint/camelcase */
 
 function getAsset(path: string) {
   return require(`../assets/${path}`);
 }
 
+async function fetchMatchStats(matchId: string): Promise<MatchDetail> {
+  const url = `https://statistic-service.w3champions.com/api/matches/${matchId}`;
+  const response = await fetch(url);
+  return response.json();
+}
+
+async function fetchRecentMatches(battleTag: string): Promise<MatchDetail> {
+  const encodedBattleTag = encodeURIComponent(battleTag);
+  const url = `https://statistic-service.w3champions.com/api/matches/search?playerId=${encodedBattleTag}&gateway=20&offset=0&pageSize=1&season=5`;
+
+  const response = await fetch(url);
+  const matchHistory = await response.json();
+
+  return fetchMatchStats(String(matchHistory.matches[0].id));
+}
+
+async function fetchOngoingMatch(battleTag: string): Promise<Match> {
+  const encodedBattleTag = encodeURIComponent(battleTag);
+  const url = `https://statistic-service.w3champions.com/api/matches/ongoing/${encodedBattleTag}`;
+
+  const response = await fetch(url);
+
+  return response.json();
+}
+
+function getHeroIcon(hero: string) {
+  return getAsset(`heroes/${hero}.png`);
+}
+function getMinimap(map: string) {
+  return getAsset(`maps/${map}.png`);
+}
+
+function getWinProbability(ratingA: number, ratingB: number) {
+  const diff = (ratingB - ratingA) / 400;
+  return Math.floor((1 / (1 + Math.pow(10, diff))) * 100);
+}
+
 export default defineComponent({
   name: "VideoOverlay",
-  components: { ScoreStatRow },
-  data(): ComponentData {
-    return {
-      battleTag: "",
-      matchHistory: {
-        count: 0,
-        matches: []
-      },
-      isRecentMatchStatsVisible: false,
-      recentMatch: {} as MatchDetail,
-      heroNames,
-      mapNames
-    };
-  },
-  computed: {
-    heroStats(): PlayerInTeam {
+  components: { WButton, ScoreStatRow },
+  setup() {
+    const battleTag = ref("");
+    const recentMatch = reactive({ data: {} as MatchDetail });
+    const currentMatch = reactive({ data: {} as Match });
+
+    const currentTab = ref(Tabs.CURRENT_MATCH);
+    const tabs = [Tabs.CURRENT_MATCH, Tabs.RECENT_MATCH];
+    const isRecentMatchStatsVisible = ref(false);
+
+    watch(currentTab, async tab => {
+      if (isRecentMatchStatsVisible.value) {
+        if (tab === Tabs.RECENT_MATCH) {
+          recentMatch.data = await fetchRecentMatches(battleTag.value);
+        }
+
+        if (tab === Tabs.CURRENT_MATCH) {
+          currentMatch.data = await fetchOngoingMatch(battleTag.value);
+        }
+      }
+    });
+    watch(isRecentMatchStatsVisible, async isVisible => {
+      if (!isVisible) {
+        currentTab.value = Tabs.CURRENT_MATCH;
+      } else {
+        if (currentTab.value === Tabs.RECENT_MATCH) {
+          recentMatch.data = await fetchRecentMatches(battleTag.value);
+        }
+
+        if (currentTab.value === Tabs.CURRENT_MATCH) {
+          currentMatch.data = await fetchOngoingMatch(battleTag.value);
+        }
+      }
+    });
+
+    const heroStats = computed(() => {
       let heroPlayer;
 
-      for (const team of (this.recentMatch as MatchDetail).match.teams) {
+      for (const team of recentMatch.data.match.teams) {
         for (const player of team.players) {
-          if (player.battleTag === this.battleTag) {
+          if (player.battleTag === battleTag.value) {
             heroPlayer = player;
             break;
           }
         }
       }
 
-      return heroPlayer as PlayerInTeam;
-    },
-    heroScores(): PlayerScore {
-      // todo: check for non empty recent match here
-      return (this.recentMatch as MatchDetail).playerScores.find(
-        score => score.battleTag === this.battleTag
-      )!;
-    },
-    opponentStats(): PlayerInTeam {
+      return heroPlayer;
+    });
+    const heroScores = computed(() =>
+      recentMatch.data.playerScores.find(
+        score => score.battleTag === battleTag.value
+      )
+    );
+    const opponentStats = computed(() => {
       let opponentPlayer;
 
-      for (const team of (this.recentMatch as MatchDetail).match.teams) {
+      for (const team of recentMatch.data.match.teams) {
         for (const player of team.players) {
-          if (player.battleTag !== this.battleTag) {
+          if (player.battleTag !== battleTag.value) {
             opponentPlayer = player;
             break;
           }
         }
       }
 
-      return opponentPlayer as PlayerInTeam;
-    },
-    opponentScores(): PlayerScore {
-      return (this.recentMatch as MatchDetail).playerScores.find(
-        score => score.battleTag !== this.battleTag
-      )!;
-    },
-    gameDuration(): string {
-      return formatDuration(
+      return opponentPlayer;
+    });
+    const opponentScores = computed(() =>
+      recentMatch.data.playerScores.find(
+        score => score.battleTag !== battleTag.value
+      )
+    );
+    const gameDuration = computed(() =>
+      formatDuration(
         intervalToDuration({
           start: 0,
-          end: (this.recentMatch as MatchDetail).match.durationInSeconds * 1000
+          end: recentMatch.data.match.durationInSeconds * 1000
         })
-      );
-    }
-  },
-  watch: {
-    isRecentMatchStatsVisible(newVal) {
-      if (newVal) this.fetchRecentMatches();
-    }
-  },
-  mounted() {
-    window.Twitch.ext.configuration.onChanged(async () => {
-      if (window.Twitch.ext.configuration.broadcaster) {
-        const config = JSON.parse(
-          window.Twitch.ext.configuration.broadcaster?.content
-        );
+      )
+    );
 
-        this.battleTag = config.battleTag;
-      }
+    onMounted(() => {
+      window.Twitch.ext.configuration.onChanged(() => {
+        if (window.Twitch.ext.configuration.broadcaster) {
+          const config = JSON.parse(
+            window.Twitch.ext.configuration.broadcaster?.content
+          );
+
+          battleTag.value = config.battleTag;
+        }
+      });
     });
-  },
-  methods: {
-    async fetchRecentMatches() {
-      if (this.battleTag) {
-        const encodedBattleTag = encodeURIComponent(this.battleTag);
-        const url = `https://statistic-service.w3champions.com/api/matches/search?playerId=${encodedBattleTag}&gateway=20&offset=0&pageSize=1&season=5`;
 
-        const response = await fetch(url);
-        this.matchHistory = await response.json();
-
-        this.fetchMatchStats(String(this.matchHistory.matches[0].id));
-      }
-    },
-    async fetchMatchStats(matchId: string): Promise<void> {
-      const url = `https://statistic-service.w3champions.com/api/matches/${matchId}`;
-      const response = await fetch(url);
-      this.recentMatch = await response.json();
-    },
-    getHeroIcon(hero: string) {
-      return getAsset(`heroes/${hero}.png`);
-    },
-    getMinimap(map: string) {
-      return getAsset(`maps/${map}.png`);
-    }
+    return {
+      battleTag,
+      isRecentMatchStatsVisible,
+      recentMatch,
+      currentMatch,
+      currentTab,
+      tabs,
+      heroNames,
+      mapNames,
+      heroStats,
+      heroScores,
+      opponentStats,
+      opponentScores,
+      gameDuration,
+      getHeroIcon,
+      getMinimap,
+      tabNames: {
+        [Tabs.CURRENT_MATCH]: "Current match",
+        [Tabs.RECENT_MATCH]: "Last match"
+      },
+      getWinProbability
+    };
   }
 });
 </script>
@@ -473,50 +409,21 @@ html {
   color: var(--color-gray);
 }
 
-.stats-toggler {
-  color: var(--color-yellow);
+.overlay-toggle {
   position: fixed;
   top: 0;
   left: 0;
-  width: 107px;
-  height: 28px;
-  background-image: url("../assets/Button_Blue.png");
-  background-size: contain;
-  border: none;
-  outline: none;
-  cursor: pointer;
-  background-color: transparent;
-
-  &:hover {
-    background-image: url("../assets/Button_Blue_Hover.png");
-  }
-
-  &:active {
-    background-image: url("../assets/Button_Blue_Active.png");
-  }
-
-  &::before {
-    content: "";
-    position: absolute;
-    background-image: url("../assets/logo.png");
-    width: 20px;
-    height: 20px;
-    left: 12px;
-    top: 4px;
-  }
 }
 
 .container {
-  background: white;
   color: white;
   width: 1022px;
   height: 657px;
   position: relative;
   background: url("../assets/background.webp");
   display: grid;
-  grid-template-areas: "header" "players" "stats";
   grid-template-columns: 1fr;
-  grid-template-rows: 85px 50px 1fr;
+  grid-template-rows: 85px 1fr;
   grid-row-gap: 25px;
   justify-content: center;
   text-align: center;
@@ -661,7 +568,7 @@ html {
   margin: 0 auto;
 
   img {
-    width: 135px;
+    max-width: 135px;
   }
 }
 
@@ -673,5 +580,26 @@ html {
   background-size: contain;
   width: 135px;
   height: 137px;
+}
+
+.header {
+  display: grid;
+  grid-template-rows: 1fr 28px;
+  grid-row-gap: 15px;
+  padding: 10px 0;
+}
+
+.header-tabs {
+  display: grid;
+  grid-auto-flow: column;
+  grid-column-gap: 10px;
+  grid-auto-columns: min-content;
+  justify-content: center;
+}
+
+.tab-area {
+  display: grid;
+  grid-template-rows: 50px 1fr;
+  grid-row-gap: 25px;
 }
 </style>
