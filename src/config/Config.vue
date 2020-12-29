@@ -29,18 +29,6 @@ interface ComponentData {
 
 export default defineComponent({
   name: "Config",
-  mounted() {
-    window.Twitch.ext.configuration.onChanged(() => {
-      if (window.Twitch.ext.configuration.broadcaster) {
-        window.Twitch.ext.rig.log("config changed");
-
-        const config = JSON.parse(
-          window.Twitch.ext.configuration.broadcaster.content
-        );
-        window.Twitch.ext.rig.log(config);
-      }
-    });
-  },
   data(): ComponentData {
     return {
       battleTag: "",

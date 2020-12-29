@@ -105,3 +105,47 @@ export interface MatchDetail {
   match: Match;
   playerScores: PlayerScore[];
 }
+
+export interface AuthorizationContext {
+  channelId: string;
+}
+
+export enum HelperMode {
+  VIEWER = "viewer",
+  DASHBOARD = "dashboard",
+  CONFIG = "config"
+}
+
+export enum HelperPlaybackMode {
+  VIDEO = "video",
+  AUDIO = "audio",
+  REMOTE = "remote",
+  CHAT_ONLY = "chat-only"
+}
+
+export enum TwitchTheme {
+  DARK = "dark",
+  LIGHT = "light"
+}
+
+export interface TwitchContext {
+  arePlayerControlsVisible: boolean;
+  bitrate: number;
+  bufferSize: number;
+  displayResolution: number;
+  game: string;
+  hlsLatencyBroadcaster: number;
+  hostingInfo:
+    | { hostedChannelId: string; hostingChannelId: string }
+    | undefined;
+  isFullScreen: boolean;
+  isMuted: boolean;
+  isPaused: boolean;
+  isTheatreMode: boolean;
+  language: string;
+  mode: HelperMode;
+  playbackMode: HelperPlaybackMode;
+  theme: TwitchTheme;
+  videoResolution: string;
+  volume: number;
+}
