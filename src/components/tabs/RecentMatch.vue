@@ -57,19 +57,49 @@
       </div>
     </div>
     <div class="stats-container">
-      <div class="heroes-stats" style="justify-content: flex-end;">
-        <div
-          v-for="hero in heroScores.heroes"
-          :key="hero.icon"
-          class="hero-icon"
-        >
-          <img
-            :src="getHeroIcon(hero.icon)"
-            width="48"
-            height="48"
-            :alt="heroNames[hero.icon]"
-          />
-          <span class="hero-level"> {{ hero.level }} </span>
+      <div class="heroes-stats-container">
+        <div class="heroes-stats">
+          <div
+            v-for="hero in heroScores.heroes"
+            :key="hero.icon"
+            class="hero-icon"
+          >
+            <img
+              :src="getHeroIcon(hero.icon)"
+              width="48"
+              height="48"
+              :alt="heroNames[hero.icon]"
+            />
+            <span class="hero-level"> {{ hero.level }} </span>
+          </div>
+        </div>
+        <div style="text-align: left;">
+          XP per minute:
+          {{
+            Math.round(
+              (heroScores.heroScore.expGained /
+                state.lastMatch.match.durationInSeconds) *
+                60
+            )
+          }}
+          <br />
+          Gold per minute:
+          {{
+            Math.round(
+              (heroScores.resourceScore.goldCollected /
+                state.lastMatch.match.durationInSeconds) *
+                60
+            )
+          }}
+          <br />
+          Lumber per minute:
+          {{
+            Math.round(
+              (heroScores.resourceScore.lumberCollected /
+                state.lastMatch.match.durationInSeconds) *
+                60
+            )
+          }}
         </div>
       </div>
       <div class="game-stats">
@@ -136,19 +166,49 @@
           />
         </div>
       </div>
-      <div class="heroes-stats">
-        <div
-          v-for="hero in opponentScores.heroes"
-          :key="hero.icon"
-          class="hero-icon"
-        >
-          <img
-            :src="getHeroIcon(hero.icon)"
-            width="48"
-            height="48"
-            :alt="heroNames[hero.icon]"
-          />
-          <span class="hero-level"> {{ hero.level }} </span>
+      <div class="heroes-stats-container">
+        <div class="heroes-stats" style="justify-content: flex-end;">
+          <div
+            v-for="hero in opponentScores.heroes"
+            :key="hero.icon"
+            class="hero-icon"
+          >
+            <img
+              :src="getHeroIcon(hero.icon)"
+              width="48"
+              height="48"
+              :alt="heroNames[hero.icon]"
+            />
+            <span class="hero-level"> {{ hero.level }} </span>
+          </div>
+        </div>
+        <div style="text-align: right;">
+          XP per minute:
+          {{
+            Math.round(
+              (opponentScores.heroScore.expGained /
+                state.lastMatch.match.durationInSeconds) *
+                60
+            )
+          }}
+          <br />
+          Gold per minute:
+          {{
+            Math.round(
+              (opponentScores.resourceScore.goldCollected /
+                state.lastMatch.match.durationInSeconds) *
+                60
+            )
+          }}
+          <br />
+          Lumber per minute:
+          {{
+            Math.round(
+              (opponentScores.resourceScore.lumberCollected /
+                state.lastMatch.match.durationInSeconds) *
+                60
+            )
+          }}
         </div>
       </div>
       <div class="map-stats">
@@ -246,12 +306,10 @@ export default defineComponent({
     );
 
     onMounted(async () => {
-      console.log("mounting recent match component");
       if (props.battleTag) {
-        const recentMatchesData = await fetchRecentMatches(props.battleTag);
+        const recentMatchesData = await fetchRecentMatches(props.battleTag, 5);
         const lastMatchId = recentMatchesData.matches[0].id;
         state.lastMatch = await fetchMatchStats(String(lastMatchId));
-        console.log(state.lastMatch);
       }
     });
 
@@ -368,5 +426,11 @@ export default defineComponent({
   width: 15px;
   display: block;
   font-size: 10px;
+}
+
+.heroes-stats-container {
+  display: grid;
+  grid-template-rows: 48px 1fr;
+  grid-row-gap: 20px;
 }
 </style>

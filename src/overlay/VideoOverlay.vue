@@ -19,16 +19,16 @@
           >
         </div>
       </header>
-      <div v-if="currentTab === 'currentMatch'">
-        current match
-      </div>
-      <KeepAlive>
-        <RecentMatch
-          v-if="currentTab === 'recentMatch'"
-          :battle-tag="battleTag"
-          class="tab-area"
-        />
-      </KeepAlive>
+      <CurrentMatch
+        v-if="currentTab === 'currentMatch'"
+        :battle-tag="battleTag"
+      />
+
+      <RecentMatch
+        v-if="currentTab === 'recentMatch'"
+        :battle-tag="battleTag"
+        class="tab-area"
+      />
     </div>
   </transition>
 </template>
@@ -36,8 +36,10 @@
 <script lang="ts">
 import { defineComponent, onMounted, reactive, ref, Ref } from "vue";
 import WButton from "@/components/common/WButton.vue";
-import { TwitchContext } from "@/typings";
+import { TwitchAuthorizationContext, TwitchContext } from "@/typings";
 import RecentMatch from "@/components/tabs/RecentMatch.vue";
+import CurrentMatch from "@/components/tabs/CurrentMatch.vue";
+import { authorizeWithTwitch, getStreamStatus } from "@/utils/fetch";
 
 enum Tabs {
   CURRENT_MATCH = "currentMatch",
@@ -46,7 +48,7 @@ enum Tabs {
 
 export default defineComponent({
   name: "VideoOverlay",
-  components: { RecentMatch, WButton },
+  components: { CurrentMatch, RecentMatch, WButton },
   setup() {
     const state = reactive({ twitchConfig: {} as TwitchContext });
     const battleTag = ref("");
@@ -55,7 +57,13 @@ export default defineComponent({
     const tabs = [Tabs.CURRENT_MATCH, Tabs.RECENT_MATCH];
     const isExtensionVisible = ref(false);
 
-    onMounted(() => {
+    onMounted(async () => {
+      window.Twitch.ext.onAuthorized(
+        async ({ channelId }: TwitchAuthorizationContext) => {
+          const token = await authorizeWithTwitch();
+          await getStreamStatus(token.access_token, channelId);
+        }
+      );
       window.Twitch.ext.configuration.onChanged(() => {
         if (window.Twitch.ext.configuration.broadcaster) {
           const config = JSON.parse(

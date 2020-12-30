@@ -1,7 +1,7 @@
-import { Segment, AuthorizationContext, TwitchContext } from "./typings";
+import { Segment, TwitchAuthorizationContext, TwitchContext } from "./typings";
 
 export interface TwitchExtension {
-  onAuthorized: (func: (context: AuthorizationContext) => void) => void;
+  onAuthorized: (func: (context: TwitchAuthorizationContext) => void) => void;
   features: {
     onChanged: (callback: (changes: string[]) => void) => void;
   };

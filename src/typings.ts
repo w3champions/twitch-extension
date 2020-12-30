@@ -55,6 +55,12 @@ export interface ServerInfo {
   playerServerInfos: PlayerServerInfo[];
 }
 
+export enum Gateways {
+  America = 10,
+  Europe = 20,
+  Asia = 30
+}
+
 export interface Match {
   map: string;
   id: number;
@@ -64,9 +70,13 @@ export interface Match {
   endTime: string;
   gameMode: EGameMode;
   teams: Team[];
-  gateWay: number;
+  gateWay: Gateways;
   season: number;
   serverInfo: ServerInfo;
+}
+
+export interface OngoingMatch extends Match {
+  teams: Team[];
 }
 
 export interface UnitScore {
@@ -106,8 +116,11 @@ export interface MatchDetail {
   playerScores: PlayerScore[];
 }
 
-export interface AuthorizationContext {
+export interface TwitchAuthorizationContext {
   channelId: string;
+  clientId: string;
+  userId: string;
+  token: string;
 }
 
 export enum HelperMode {
@@ -149,3 +162,50 @@ export interface TwitchContext {
   videoResolution: string;
   volume: number;
 }
+
+export interface PlayerId {
+  name: string;
+  battleTag: string;
+}
+
+export interface ModeStat {
+  id: string;
+  gameMode: EGameMode;
+  gateWay: Gateways;
+  race: ERaceEnum;
+  wins: number;
+  losses: number;
+  games: number;
+  winrate: number;
+  mmr: number;
+  leagueId: number;
+  leagueOrder: number;
+  division: number;
+  rank: number;
+  season: number;
+  rankingPoints: number;
+  playerIds: PlayerId[];
+  quantile: number;
+}
+
+export interface TwitchToken {
+  access_token: string;
+  expires_in: number;
+  token_type: string;
+}
+
+export type TwitchStreamResponse = {
+  data: TwitchStreamStatus[];
+};
+
+export type TwitchStreamStatus = {
+  id: string;
+  user_id?: string;
+  user_name: string;
+  game_id: string;
+  type: string;
+  title: string;
+  viewer_count: number;
+  started_at: string;
+  language: string;
+};
