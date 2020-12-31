@@ -17,10 +17,11 @@ export async function fetchMatchStats(matchId: string): Promise<MatchDetail> {
 
 export async function fetchRecentMatches(
   battleTag: string,
-  season: number
+  season: number,
+  pageSize = 1
 ): Promise<{ count: number; matches: Match[] }> {
   const encodedBattleTag = encodeURIComponent(battleTag);
-  const url = `https://statistic-service.w3champions.com/api/matches/search?playerId=${encodedBattleTag}&gateway=${Gateways.Europe}&offset=0&pageSize=1&season=${season}&gameMode=${EGameMode.GM_1ON1}`;
+  const url = `https://statistic-service.w3champions.com/api/matches/search?playerId=${encodedBattleTag}&gateway=${Gateways.Europe}&offset=0&pageSize=${pageSize}&season=${season}&gameMode=${EGameMode.GM_1ON1}`;
 
   const response = await fetch(url);
   return response.json();

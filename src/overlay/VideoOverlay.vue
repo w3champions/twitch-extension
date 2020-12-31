@@ -19,6 +19,7 @@
           >
         </div>
       </header>
+
       <CurrentMatch
         v-if="currentTab === 'currentMatch'"
         :battle-tag="battleTag"
@@ -27,7 +28,12 @@
       <RecentMatch
         v-if="currentTab === 'recentMatch'"
         :battle-tag="battleTag"
-        class="tab-area"
+      />
+
+      <TodayResults
+        v-if="currentTab === 'todayResults'"
+        :battle-tag="battleTag"
+        :stream-started-at="streamStartedAt"
       />
     </div>
   </transition>
@@ -40,28 +46,38 @@ import { TwitchAuthorizationContext, TwitchContext } from "@/typings";
 import RecentMatch from "@/components/tabs/RecentMatch.vue";
 import CurrentMatch from "@/components/tabs/CurrentMatch.vue";
 import { authorizeWithTwitch, getStreamStatus } from "@/utils/fetch";
+import TodayResults from "@/components/tabs/TodayResults.vue";
 
 enum Tabs {
   CURRENT_MATCH = "currentMatch",
-  RECENT_MATCH = "recentMatch"
+  RECENT_MATCH = "recentMatch",
+  TODAY_RESULTS = "todayResults"
 }
 
 export default defineComponent({
   name: "VideoOverlay",
-  components: { CurrentMatch, RecentMatch, WButton },
+  components: { TodayResults, CurrentMatch, RecentMatch, WButton },
   setup() {
     const state = reactive({ twitchConfig: {} as TwitchContext });
     const battleTag = ref("");
+    const streamStartedAt = ref("");
 
     const currentTab: Ref<string> = ref(Tabs.CURRENT_MATCH);
-    const tabs = [Tabs.CURRENT_MATCH, Tabs.RECENT_MATCH];
+    const tabs = [Tabs.CURRENT_MATCH, Tabs.RECENT_MATCH, Tabs.TODAY_RESULTS];
     const isExtensionVisible = ref(false);
 
     onMounted(async () => {
       window.Twitch.ext.onAuthorized(
         async ({ channelId }: TwitchAuthorizationContext) => {
           const token = await authorizeWithTwitch();
-          await getStreamStatus(token.access_token, channelId);
+          const streamStatus = await getStreamStatus(
+            token.access_token,
+            channelId
+          );
+          const channelStatus = streamStatus.data.find(
+            stream => stream.user_id === channelId
+          );
+          streamStartedAt.value = channelStatus!.started_at;
         }
       );
       window.Twitch.ext.configuration.onChanged(() => {
@@ -87,8 +103,10 @@ export default defineComponent({
       tabs,
       tabNames: {
         [Tabs.CURRENT_MATCH]: "Current match",
-        [Tabs.RECENT_MATCH]: "Last match"
-      }
+        [Tabs.RECENT_MATCH]: "Last match",
+        [Tabs.TODAY_RESULTS]: "Today results"
+      },
+      streamStartedAt
     };
   }
 });
@@ -131,7 +149,7 @@ html {
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 85px 1fr;
-  grid-row-gap: 25px;
+  grid-row-gap: 10px;
   justify-content: center;
   text-align: center;
   padding: 60px 60px 30px;
