@@ -1,9 +1,7 @@
 <template>
   <div class="today-results">
     <template v-if="selectedMatchId">
-      <span class="today-results__back" @click="selectedMatchId = ''"
-        >Back</span
-      >
+      <WButton @click="selectedMatchId = ''">Back</WButton>
       <RecentMatch :match-id="selectedMatchId" :battle-tag="battleTag" />
     </template>
 
@@ -12,18 +10,32 @@
         <div>
           <h3 class="today-results__header">Today score</h3>
           <p class="today-results__score">
-            <span style="color: green;">{{ results.win }}</span
-            >-<span style="color: red;">{{ results.loss }}</span>
+            <span style="color: green;">{{ results.won.length }}</span
+            >-<span style="color: red;">{{ results.lost.length }}</span>
           </p>
         </div>
         <div class="today-results__match-list">
-          <MatchResult
-            v-for="match in state.todayMatches"
-            :key="match.id"
-            :match="match"
-            :battle-tag="battleTag"
-            @click="selectedMatchId = match.id"
-          />
+          <div>
+            <h3 class="today-results__wins">WINS:</h3>
+            <MatchResult
+              v-for="match in results.won"
+              :key="match.id"
+              :match="match"
+              :battle-tag="battleTag"
+              @click="selectedMatchId = match.id"
+            />
+          </div>
+
+          <div>
+            <h3 class="today-results__losses">LOSSES:</h3>
+            <MatchResult
+              v-for="match in results.lost"
+              :key="match.id"
+              :match="match"
+              :battle-tag="battleTag"
+              @click="selectedMatchId = match.id"
+            />
+          </div>
         </div>
       </div>
     </template>
@@ -37,6 +49,7 @@ import { EGameMode, Match } from "@/typings";
 import isAfter from "date-fns/isAfter";
 import MatchResult from "@/components/MatchResult.vue";
 import RecentMatch from "@/components/RecentMatch.vue";
+import WButton from "@/components/common/WButton.vue";
 
 type Props = {
   streamStartedAt: string;
@@ -46,7 +59,7 @@ type Props = {
 
 export default defineComponent({
   name: "TodayResults",
-  components: { RecentMatch, MatchResult },
+  components: { WButton, RecentMatch, MatchResult },
   props: {
     streamStartedAt: {
       type: String,
@@ -82,16 +95,16 @@ export default defineComponent({
     });
 
     const results = computed(() => {
-      const r = { win: 0, loss: 0 };
+      const r = { won: [] as Match[], lost: [] as Match[] };
 
       for (const match of state.todayMatches) {
         for (const team of match.teams) {
           for (const player of team.players) {
             if (player.battleTag === props.battleTag) {
               if (player.won) {
-                r.win++;
+                r.won.push(match);
               } else {
-                r.loss++;
+                r.lost.push(match);
               }
             }
           }
@@ -129,6 +142,9 @@ export default defineComponent({
   }
 
   &__match-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-column-gap: 20px;
     text-align: left;
     margin-bottom: 15px;
     max-height: 100%;
@@ -137,6 +153,19 @@ export default defineComponent({
 
   &__back {
     cursor: pointer;
+  }
+
+  &__wins,
+  &__losses {
+    margin-top: 0;
+  }
+
+  &__wins {
+    color: var(--color-green);
+  }
+
+  &__losses {
+    color: var(--color-red);
   }
 }
 </style>

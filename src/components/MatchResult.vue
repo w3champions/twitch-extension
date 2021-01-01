@@ -1,9 +1,7 @@
 <template>
   <div v-if="hero && opponent" class="match-result">
-    <span :style="{ color: hero.won ? 'green' : 'red' }">{{
-      hero.won ? "Defeated" : "Lost to"
-    }}</span>
-    {{ opponent.name }} on {{ mapNames[match.map] }} in
+    <span style="color: var(--color-yellow)">{{ opponent.name }}</span> on
+    {{ mapNames[match.map] }} in
     {{ formatMatchDuration(match.durationInSeconds) }}
   </div>
 </template>
@@ -12,21 +10,19 @@
 import { defineComponent } from "vue";
 import { Match } from "@/typings";
 import { mapNames } from "@/constants/constants";
-import formatDuration from "date-fns/formatDuration";
 import intervalToDuration from "date-fns/intervalToDuration";
-
 type PropTypes = {
   match: Match;
   battleTag: string;
 };
 
-function formatMatchDuration(duration: number) {
-  return formatDuration(
-    intervalToDuration({
-      start: 0,
-      end: duration * 1000
-    })
-  );
+function formatMatchDuration(interval: number): string {
+  const duration = intervalToDuration({ start: 0, end: interval * 1000 });
+
+  return [duration.hours, duration.minutes, duration.seconds]
+    .filter(duration => duration && duration > 0)
+    .map(duration => String(duration).padStart(2, "0"))
+    .join(":");
 }
 
 export default defineComponent({
