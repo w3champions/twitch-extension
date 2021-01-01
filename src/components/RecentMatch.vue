@@ -4,7 +4,7 @@
       <div class="winner-icon">
         <img
           v-if="heroStats.won"
-          src="../../assets/Crown_Indicator.png"
+          src="../assets/Crown_Indicator.png"
           width="50"
           height="50"
           alt="winner"
@@ -49,7 +49,7 @@
       <div class="winner-icon">
         <img
           v-if="opponentStats.won"
-          src="../../assets/Crown_Indicator.png"
+          src="../assets/Crown_Indicator.png"
           width="50"
           height="50"
           alt="winner"
@@ -237,7 +237,7 @@ import intervalToDuration from "date-fns/intervalToDuration";
 import { getAsset } from "@/utils/assets";
 import { heroNames, mapNames } from "@/constants/constants";
 import ScoreStat from "@/components/ScoreStat.vue";
-import { fetchMatchStats, fetchRecentMatches } from "@/utils/fetch";
+import { fetchMatchStats } from "@/utils/fetch";
 
 function getHeroIcon(hero: string) {
   return getAsset(`heroes/${hero}.png`);
@@ -247,6 +247,11 @@ function getMinimap(map: string) {
   return getAsset(`maps/${map}.png`);
 }
 
+type Props = {
+  battleTag: string;
+  matchId: string;
+};
+
 export default defineComponent({
   name: "RecentMatch",
   components: { ScoreStat },
@@ -254,9 +259,13 @@ export default defineComponent({
     battleTag: {
       type: String,
       default: ""
+    },
+    matchId: {
+      type: String,
+      required: true
     }
   },
-  setup(props) {
+  setup(props: Props) {
     const state = reactive({ lastMatch: {} as MatchDetail });
     const heroStats = computed(() => {
       let heroPlayer;
@@ -307,9 +316,7 @@ export default defineComponent({
 
     onMounted(async () => {
       if (props.battleTag) {
-        const recentMatchesData = await fetchRecentMatches(props.battleTag, 5);
-        const lastMatchId = recentMatchesData.matches[0].id;
-        state.lastMatch = await fetchMatchStats(String(lastMatchId));
+        state.lastMatch = await fetchMatchStats(props.matchId);
       }
     });
 
@@ -401,7 +408,7 @@ export default defineComponent({
   position: absolute;
   top: 0;
   left: 0;
-  background-image: url("../../assets/Map_Frame.png");
+  background-image: url("../assets/Map_Frame.png");
   background-size: contain;
   width: 135px;
   height: 137px;

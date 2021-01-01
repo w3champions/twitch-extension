@@ -20,20 +20,17 @@
         </div>
       </header>
 
-      <CurrentMatch
+      <OngoingMatch
         v-if="currentTab === 'currentMatch'"
         :battle-tag="battleTag"
-      />
-
-      <RecentMatch
-        v-if="currentTab === 'recentMatch'"
-        :battle-tag="battleTag"
+        :current-season="currentSeason"
       />
 
       <TodayResults
         v-if="currentTab === 'todayResults'"
         :battle-tag="battleTag"
         :stream-started-at="streamStartedAt"
+        :current-season="currentSeason"
       />
     </div>
   </transition>
@@ -43,27 +40,30 @@
 import { defineComponent, onMounted, reactive, ref, Ref } from "vue";
 import WButton from "@/components/common/WButton.vue";
 import { TwitchAuthorizationContext, TwitchContext } from "@/typings";
-import RecentMatch from "@/components/tabs/RecentMatch.vue";
-import CurrentMatch from "@/components/tabs/CurrentMatch.vue";
-import { authorizeWithTwitch, getStreamStatus } from "@/utils/fetch";
+import OngoingMatch from "@/components/tabs/OngoingMatch.vue";
+import {
+  authorizeWithTwitch,
+  fetchSeasons,
+  getStreamStatus
+} from "@/utils/fetch";
 import TodayResults from "@/components/tabs/TodayResults.vue";
 
 enum Tabs {
   CURRENT_MATCH = "currentMatch",
-  RECENT_MATCH = "recentMatch",
   TODAY_RESULTS = "todayResults"
 }
 
 export default defineComponent({
   name: "VideoOverlay",
-  components: { TodayResults, CurrentMatch, RecentMatch, WButton },
+  components: { TodayResults, OngoingMatch, WButton },
   setup() {
     const state = reactive({ twitchConfig: {} as TwitchContext });
     const battleTag = ref("");
+    const currentSeason: Ref<number | null> = ref(null);
     const streamStartedAt = ref("");
 
     const currentTab: Ref<string> = ref(Tabs.CURRENT_MATCH);
-    const tabs = [Tabs.CURRENT_MATCH, Tabs.RECENT_MATCH, Tabs.TODAY_RESULTS];
+    const tabs = [Tabs.CURRENT_MATCH, Tabs.TODAY_RESULTS];
     const isExtensionVisible = ref(false);
 
     onMounted(async () => {
@@ -80,6 +80,7 @@ export default defineComponent({
           streamStartedAt.value = channelStatus!.started_at;
         }
       );
+
       window.Twitch.ext.configuration.onChanged(() => {
         if (window.Twitch.ext.configuration.broadcaster) {
           const config = JSON.parse(
@@ -93,6 +94,9 @@ export default defineComponent({
       window.Twitch.ext.onContext((ctx: TwitchContext) => {
         state.twitchConfig = ctx;
       });
+
+      const seasons = await fetchSeasons();
+      currentSeason.value = seasons[0].id;
     });
 
     return {
@@ -103,10 +107,10 @@ export default defineComponent({
       tabs,
       tabNames: {
         [Tabs.CURRENT_MATCH]: "Current match",
-        [Tabs.RECENT_MATCH]: "Last match",
         [Tabs.TODAY_RESULTS]: "Today results"
       },
-      streamStartedAt
+      streamStartedAt,
+      currentSeason
     };
   }
 });
@@ -148,7 +152,7 @@ html {
   background: url("../assets/background.webp");
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: 85px 1fr;
+  grid-template-rows: 85px 470px;
   grid-row-gap: 10px;
   justify-content: center;
   text-align: center;

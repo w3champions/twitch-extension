@@ -1,7 +1,9 @@
 <template>
-  <div v-if="hero && opponent" :style="{ color: hero.won ? 'green' : 'red' }">
-    {{ hero.won ? "Win" : "Loss" }} against {{ opponent.name }} on
-    {{ mapNames[match.map] }} in
+  <div v-if="hero && opponent" class="match-result">
+    <span :style="{ color: hero.won ? 'green' : 'red' }">{{
+      hero.won ? "Defeated" : "Lost to"
+    }}</span>
+    {{ opponent.name }} on {{ mapNames[match.map] }} in
     {{ formatMatchDuration(match.durationInSeconds) }}
   </div>
 </template>
@@ -63,4 +65,8 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.match-result {
+  cursor: pointer;
+}
+</style>

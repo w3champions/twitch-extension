@@ -5,6 +5,7 @@ import {
   MatchDetail,
   ModeStat,
   OngoingMatch,
+  Season,
   TwitchStreamResponse,
   TwitchToken
 } from "@/typings";
@@ -29,11 +30,15 @@ export async function fetchRecentMatches(
 
 export async function fetchOngoingMatch(
   battleTag: string
-): Promise<OngoingMatch> {
+): Promise<OngoingMatch | null> {
   const encodedBattleTag = encodeURIComponent(battleTag);
   const url = `https://statistic-service.w3champions.com/api/matches/ongoing/${encodedBattleTag}`;
 
   const response = await fetch(url);
+
+  if (response.status === 204) {
+    null;
+  }
 
   return response.json();
 }
@@ -106,5 +111,11 @@ export async function getStreamStatus(
       Authorization: `Bearer ${token}`
     }
   });
+  return response.json();
+}
+
+export async function fetchSeasons(): Promise<Season[]> {
+  const url = "https://statistic-service.w3champions.com/api/ladder/seasons";
+  const response = await fetch(url);
   return response.json();
 }

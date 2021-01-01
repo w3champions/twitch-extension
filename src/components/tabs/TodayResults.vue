@@ -1,29 +1,52 @@
 <template>
-  <div>
-    <h3>Today score</h3>
-    <p style="font-size: 36px;">
-      <span style="color: green;">{{ results.win }}</span
-      >-<span style="color: red;">{{ results.loss }}</span>
-    </p>
-    <MatchResult
-      v-for="match in state.todayMatches"
-      :key="match.id"
-      :match="match"
-      :battle-tag="battleTag"
-    />
+  <div class="today-results">
+    <template v-if="selectedMatchId">
+      <span class="today-results__back" @click="selectedMatchId = ''"
+        >Back</span
+      >
+      <RecentMatch :match-id="selectedMatchId" :battle-tag="battleTag" />
+    </template>
+
+    <template v-else>
+      <div class="today-results__results">
+        <div>
+          <h3 class="today-results__header">Today score</h3>
+          <p class="today-results__score">
+            <span style="color: green;">{{ results.win }}</span
+            >-<span style="color: red;">{{ results.loss }}</span>
+          </p>
+        </div>
+        <div class="today-results__match-list">
+          <MatchResult
+            v-for="match in state.todayMatches"
+            :key="match.id"
+            :match="match"
+            :battle-tag="battleTag"
+            @click="selectedMatchId = match.id"
+          />
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, reactive } from "vue";
+import { computed, defineComponent, onMounted, ref, reactive } from "vue";
 import { fetchRecentMatches } from "@/utils/fetch";
 import { EGameMode, Match } from "@/typings";
 import isAfter from "date-fns/isAfter";
 import MatchResult from "@/components/MatchResult.vue";
+import RecentMatch from "@/components/RecentMatch.vue";
+
+type Props = {
+  streamStartedAt: string;
+  battleTag: string;
+  currentSeason: number;
+};
 
 export default defineComponent({
   name: "TodayResults",
-  components: { MatchResult },
+  components: { RecentMatch, MatchResult },
   props: {
     streamStartedAt: {
       type: String,
@@ -32,14 +55,25 @@ export default defineComponent({
     battleTag: {
       type: String,
       default: ""
+    },
+    currentSeason: {
+      type: Number,
+      required: true
     }
   },
-  setup(props) {
+  setup(props: Props) {
+    const selectedMatchId = ref("");
     const state = reactive({ todayMatches: [] as Match[] });
 
     onMounted(async () => {
-      const matches = await fetchRecentMatches(props.battleTag, 5, 50);
+      const pageSize = 50;
+      const matches = await fetchRecentMatches(
+        props.battleTag,
+        props.currentSeason,
+        pageSize
+      );
       const streamStartedAtDate = new Date(props.streamStartedAt);
+
       state.todayMatches = matches.matches.filter(
         match =>
           match.gameMode === EGameMode.GM_1ON1 &&
@@ -68,6 +102,7 @@ export default defineComponent({
     });
 
     return {
+      selectedMatchId,
       state,
       results
     };
@@ -75,4 +110,33 @@ export default defineComponent({
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.today-results {
+  &__results {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    grid-column-gap: 15px;
+    height: 100%;
+  }
+
+  &__header {
+    margin: 0;
+  }
+
+  &__score {
+    font-size: 36px;
+    margin: 0;
+  }
+
+  &__match-list {
+    text-align: left;
+    margin-bottom: 15px;
+    max-height: 100%;
+    overflow: auto;
+  }
+
+  &__back {
+    cursor: pointer;
+  }
+}
+</style>

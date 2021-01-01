@@ -194,11 +194,11 @@ export interface TwitchToken {
   token_type: string;
 }
 
-export type TwitchStreamResponse = {
+export interface TwitchStreamResponse {
   data: TwitchStreamStatus[];
-};
+}
 
-export type TwitchStreamStatus = {
+export interface TwitchStreamStatus {
   id: string;
   user_id?: string;
   user_name: string;
@@ -208,4 +208,8 @@ export type TwitchStreamStatus = {
   viewer_count: number;
   started_at: string;
   language: string;
-};
+}
+
+export interface Season {
+  id: number;
+}
