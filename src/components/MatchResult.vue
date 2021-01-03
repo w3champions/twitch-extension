@@ -18,11 +18,11 @@ type PropTypes = {
 
 function formatMatchDuration(interval: number): string {
   const duration = intervalToDuration({ start: 0, end: interval * 1000 });
+  const durations = [duration.minutes, duration.seconds];
 
-  return [duration.hours, duration.minutes, duration.seconds]
-    .filter(duration => duration && duration > 0)
-    .map(duration => String(duration).padStart(2, "0"))
-    .join(":");
+  if (duration.hours && duration.hours > 0) durations.unshift(duration.hours);
+
+  return durations.map(duration => String(duration).padStart(2, "0")).join(":");
 }
 
 export default defineComponent({
