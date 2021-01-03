@@ -1,9 +1,11 @@
 <template>
-  <button
-    v-if="state.twitchConfig.arePlayerControlsVisible"
-    class="overlay-toggle"
-    @click="isExtensionVisible = true"
-  />
+  <Transition name="slide-left">
+    <button
+      v-if="state.twitchConfig.arePlayerControlsVisible"
+      class="overlay-toggle"
+      @click="isExtensionVisible = true"
+    />
+  </Transition>
   <transition name="slide">
     <div v-if="isExtensionVisible" class="container">
       <button class="close-button" @click="isExtensionVisible = false" />
@@ -138,10 +140,14 @@ html {
   position: fixed;
   top: 50%;
   left: 0;
-  width: 48px;
-  height: 48px;
-  background: url("../assets/favicon-black.png");
+  width: 70px;
+  height: 135px;
+  margin-top: -67px;
+  background: url("../assets/W3C_TwitchButton.png");
   background-size: contain;
+  border: none;
+  outline: none;
+  cursor: pointer;
 }
 
 .container {
@@ -186,6 +192,14 @@ html {
   animation: bounceInDown 1s reverse;
 }
 
+.slide-left-enter-active {
+  animation: slideInLeft 0.5s;
+}
+
+.slide-left-leave-active {
+  animation: slideInLeft 0.5s reverse;
+}
+
 @keyframes bounceInDown {
   0%,
   60%,
@@ -214,6 +228,19 @@ html {
   }
 
   to {
+    transform: translateZ(0);
+  }
+}
+
+@keyframes slideInLeft {
+  0% {
+    -webkit-transform: translate3d(-100%, 0, 0);
+    transform: translate3d(-100%, 0, 0);
+    visibility: visible;
+  }
+
+  to {
+    -webkit-transform: translateZ(0);
     transform: translateZ(0);
   }
 }
