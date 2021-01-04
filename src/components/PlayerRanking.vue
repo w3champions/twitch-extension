@@ -127,32 +127,32 @@ export default {
 
   &--grandmaster {
     &::before {
-      background: url("https://res.cloudinary.com/dhn8hhx9x/image/upload/v1608416234/w3champions/grandmaster_kfh9vd.png");
+      background: url("../assets/leagues/grandmaster.png");
     }
   }
 
   &--master::before {
-    background: url("https://res.cloudinary.com/dhn8hhx9x/image/upload/v1608416235/w3champions/master_khnpxs.png");
+    background: url("../assets/leagues/master.png");
   }
 
   &--diamond::before {
-    background: url("https://res.cloudinary.com/dhn8hhx9x/image/upload/v1608416234/w3champions/diamond_jzrtpt.png");
+    background: url("../assets/leagues/diamond.png");
   }
 
   &--platinum::before {
-    background: url("https://res.cloudinary.com/dhn8hhx9x/image/upload/v1608416234/w3champions/platinum_kmr6dg.png");
+    background: url("../assets/leagues/platinum.png");
   }
 
   &--gold::before {
-    background: url("https://res.cloudinary.com/dhn8hhx9x/image/upload/v1608416234/w3champions/gold_ndjgov.png");
+    background: url("../assets/leagues/gold.png");
   }
 
   &--silver::before {
-    background: url("https://res.cloudinary.com/dhn8hhx9x/image/upload/v1608416235/w3champions/silver_oykflr.png");
+    background: url("../assets/leagues/silver.png");
   }
 
   &--bronze::before {
-    background: url("https://res.cloudinary.com/dhn8hhx9x/image/upload/v1608416234/w3champions/bronze_qoadxd.png");
+    background: url("../assets/leagues/bronze.png");
   }
 
   &__name {

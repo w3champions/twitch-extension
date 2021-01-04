@@ -3,6 +3,7 @@
     <template v-if="state.ongoingMatch">
       <div class="ongoing-match__column">
         <PlayerRanking
+          v-if="state.heroStats"
           :name="state.hero.name"
           :league-id="state.heroStats.leagueId"
           :wins="state.heroStats.wins"
@@ -28,6 +29,7 @@
       </div>
       <div class="ongoing-match__column">
         <PlayerRanking
+          v-if="state.opponentStats"
           :name="state.opponent.name"
           :league-id="state.opponentStats.leagueId"
           :wins="state.opponentStats.wins"
