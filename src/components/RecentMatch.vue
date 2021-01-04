@@ -23,13 +23,21 @@
           >)
         </div>
       </div>
-      <div class="player-name" style="text-align: right;">
+      <div
+        class="player-name"
+        style="text-align: right;"
+        :title="heroStats.name"
+      >
         {{ heroStats.name }}
       </div>
       <div class="race-icon"></div>
       <div>VS</div>
       <div class="race-icon"></div>
-      <div class="player-name" style="text-align: left;">
+      <div
+        class="player-name"
+        style="text-align: left;"
+        :title="opponentStats.name"
+      >
         {{ opponentStats.name }}
       </div>
       <div class="mmr-stats" style="text-align: right;">
@@ -369,6 +377,8 @@ export default defineComponent({
   color: var(--color-yellow);
   font-weight: bold;
   font-size: 28px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .game-stats-section {
