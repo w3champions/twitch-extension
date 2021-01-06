@@ -41,7 +41,7 @@
         />
       </div>
     </template>
-    <p v-else style="font-size: 24px;">No match in progress</p>
+    <p v-else style="font-size: 24px;">No 1v1 match currently in progress</p>
   </div>
 </template>
 
@@ -104,7 +104,7 @@ export default defineComponent({
     onMounted(async () => {
       if (props.battleTag) {
         const ongoingMatch = await fetchOngoingMatch(props.battleTag);
-        if (ongoingMatch) {
+        if (ongoingMatch && ongoingMatch.gameMode === EGameMode.GM_1ON1) {
           state.ongoingMatch = ongoingMatch;
 
           const matchPlayers = state.ongoingMatch.teams.flatMap(t => t.players);
