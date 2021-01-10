@@ -30,9 +30,13 @@
       >
         {{ heroStats.name }}
       </div>
-      <div class="race-icon"></div>
+      <div class="race-icon">
+        <img :src="getRaceIcon(heroStats.race)" width="115" height="115" />
+      </div>
       <div>VS</div>
-      <div class="race-icon"></div>
+      <div class="race-icon">
+        <img :src="getRaceIcon(opponentStats.race)" width="115" height="115" />
+      </div>
       <div
         class="player-name"
         style="text-align: left;"
@@ -242,7 +246,7 @@ import { computed, defineComponent, onMounted, reactive } from "vue";
 import { MatchDetail } from "@/typings";
 import formatDuration from "date-fns/formatDuration";
 import intervalToDuration from "date-fns/intervalToDuration";
-import { getAsset } from "@/utils/assets";
+import { getAsset, getRaceIcon } from "@/utils/assets";
 import { heroNames, mapNames } from "@/constants/constants";
 import ScoreStat from "@/components/ScoreStat.vue";
 import { fetchMatchStats } from "@/utils/fetch";
@@ -337,6 +341,7 @@ export default defineComponent({
       state,
       getHeroIcon,
       getMinimap,
+      getRaceIcon,
       heroNames,
       mapNames
     };
@@ -348,12 +353,13 @@ export default defineComponent({
 .last-match {
   display: grid;
   grid-template-rows: 50px 1fr;
-  grid-row-gap: 25px;
+  grid-row-gap: 20px;
+  margin-top: 5px;
 }
 
 .player-infos {
   display: grid;
-  grid-template-columns: 50px 150px 1fr 50px 50px 50px 1fr 150px 50px;
+  grid-template-columns: 50px 120px 1fr 50px 50px 50px 1fr 120px 50px;
   grid-template-rows: 50px;
   align-items: center;
   grid-column-gap: 10px;
@@ -449,5 +455,15 @@ export default defineComponent({
   display: grid;
   grid-template-rows: 48px 1fr;
   grid-row-gap: 20px;
+}
+
+.race-icon {
+  display: flex;
+  align-items: center;
+
+  img {
+    width: 100%;
+    height: 100%;
+  }
 }
 </style>

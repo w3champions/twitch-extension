@@ -3,7 +3,7 @@
     <button
       v-if="state.twitchConfig.arePlayerControlsVisible"
       class="overlay-toggle"
-      @click="isExtensionVisible = true"
+      @click="isExtensionVisible = !isExtensionVisible"
     />
   </Transition>
   <transition name="slide">

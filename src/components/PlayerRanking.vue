@@ -1,6 +1,9 @@
 <template>
   <div :class="rootClass">
     <div class="player-ranking__name">{{ name }}</div>
+    <div class="player-ranking__race">
+      <img :src="getRaceIcon(race)" width="50" height="50" />
+    </div>
 
     <div class="player-ranking__rank">
       Rank {{ rank }} | <span class="player-ranking__wins">{{ wins }}</span> -
@@ -19,6 +22,7 @@
 </template>
 <script lang="ts">
 import { computed } from "vue";
+import { getRaceIcon } from "@/utils/assets";
 
 const leagues = [
   "grandmaster",
@@ -83,6 +87,10 @@ export default {
     leagueId: {
       type: Number,
       required: true
+    },
+    race: {
+      type: Number,
+      required: true
     }
   },
   setup(props: Props) {
@@ -99,7 +107,8 @@ export default {
     return {
       rootClass,
       leagues,
-      winProbability
+      winProbability,
+      getRaceIcon
     };
   }
 };

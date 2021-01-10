@@ -12,6 +12,7 @@
           :mmr="state.heroStats.mmr"
           :opponent-mmr="state.opponentStats.mmr"
           :rank="state.heroStats.rank"
+          :race="state.heroStats.race"
         />
       </div>
       <div style="padding-top: 10px">
@@ -38,10 +39,13 @@
           :mmr="state.opponentStats.mmr"
           :opponent-mmr="state.heroStats.mmr"
           :rank="state.opponentStats.rank"
+          :race="state.opponentStats.race"
         />
       </div>
     </template>
-    <p v-else style="font-size: 24px;">No 1v1 match currently in progress</p>
+    <p v-else style="font-size: 24px; grid-column: 2;">
+      No 1v1 match currently in progress
+    </p>
   </div>
 </template>
 
