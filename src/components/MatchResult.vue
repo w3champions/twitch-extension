@@ -3,6 +3,7 @@
     <span style="color: var(--color-yellow)">{{ opponent.name }}</span> on
     {{ mapNames[match.map] }} in
     {{ formatMatchDuration(match.durationInSeconds) }}
+    &rarr;
   </div>
 </template>
 
