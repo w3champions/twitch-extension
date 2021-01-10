@@ -1,7 +1,9 @@
 <template>
   <div v-if="hero && opponent" class="match-result">
-    <span style="color: var(--color-yellow)">{{ opponent.name }}</span> on
-    {{ mapNames[match.map] }} in
+    <span v-if="withOpponentName" style="color: var(--color-yellow)">{{
+      opponent.name
+    }}</span>
+    on {{ mapNames[match.map] }} in
     {{ formatMatchDuration(match.durationInSeconds) }}
     &rarr;
   </div>
@@ -15,6 +17,7 @@ import intervalToDuration from "date-fns/intervalToDuration";
 type PropTypes = {
   match: Match;
   battleTag: string;
+  withOpponentName: boolean;
 };
 
 function formatMatchDuration(interval: number): string {
@@ -36,6 +39,10 @@ export default defineComponent({
     match: {
       type: Object as () => Match,
       required: true
+    },
+    withOpponentName: {
+      type: Boolean,
+      default: true
     }
   },
   setup(props: PropTypes) {

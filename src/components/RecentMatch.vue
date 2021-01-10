@@ -31,11 +31,21 @@
         {{ heroStats.name }}
       </div>
       <div class="race-icon">
-        <img :src="getRaceIcon(heroStats.race)" width="115" height="115" />
+        <img
+          :src="getRaceIcon(heroStats.race)"
+          width="50"
+          height="50"
+          alt="race"
+        />
       </div>
       <div>VS</div>
       <div class="race-icon">
-        <img :src="getRaceIcon(opponentStats.race)" width="115" height="115" />
+        <img
+          :src="getRaceIcon(opponentStats.race)"
+          width="50"
+          height="50"
+          alt="race"
+        />
       </div>
       <div
         class="player-name"
@@ -228,10 +238,7 @@
           Map:<br />
           {{ mapNames[state.lastMatch.match.map] }}
         </div>
-        <div class="map">
-          <img :src="getMinimap(state.lastMatch.match.map)" alt="minimap" />
-          <div class="minimap-overlay"></div>
-        </div>
+        <MiniMap :map="state.lastMatch.match.map" />
         <div style="text-align: left">
           Duration:<br />
           {{ gameDuration }}
@@ -250,13 +257,10 @@ import { getAsset, getRaceIcon } from "@/utils/assets";
 import { heroNames, mapNames } from "@/constants/constants";
 import ScoreStat from "@/components/ScoreStat.vue";
 import { fetchMatchStats } from "@/utils/fetch";
+import MiniMap from "@/components/MiniMap.vue";
 
 function getHeroIcon(hero: string) {
   return getAsset(`heroes/${hero}.png`);
-}
-
-function getMinimap(map: string) {
-  return getAsset(`maps/${map}.png`);
 }
 
 type Props = {
@@ -266,7 +270,7 @@ type Props = {
 
 export default defineComponent({
   name: "RecentMatch",
-  components: { ScoreStat },
+  components: { MiniMap, ScoreStat },
   props: {
     battleTag: {
       type: String,
@@ -340,7 +344,6 @@ export default defineComponent({
       gameDuration,
       state,
       getHeroIcon,
-      getMinimap,
       getRaceIcon,
       heroNames,
       mapNames
@@ -405,30 +408,6 @@ export default defineComponent({
   grid-column-gap: 12px;
 }
 
-.map {
-  grid-column: 2;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  width: 135px;
-  height: 137px;
-  margin: 0 auto;
-
-  img {
-    max-width: 135px;
-  }
-}
-
-.minimap-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-image: url("../assets/Map_Frame.png");
-  background-size: contain;
-  width: 135px;
-  height: 137px;
-}
 .heroes-stats {
   display: grid;
   grid-auto-flow: column;
