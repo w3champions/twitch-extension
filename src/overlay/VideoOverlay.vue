@@ -7,7 +7,11 @@
     />
   </Transition>
   <transition name="slide">
-    <div v-if="isExtensionVisible" class="container">
+    <div
+      v-if="isExtensionVisible"
+      class="container"
+      :style="{ transform: `scale(${scaleFactor})` }"
+    >
       <button class="close-button" @click="isExtensionVisible = false" />
       <header class="header">
         <div class="promo"></div>
@@ -39,7 +43,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, ref, Ref } from "vue";
+import { defineComponent, watch, onMounted, reactive, ref, Ref } from "vue";
 import WButton from "@/components/common/WButton.vue";
 import { TwitchAuthorizationContext, TwitchContext } from "@/typings";
 import OngoingMatch from "@/components/tabs/OngoingMatch.vue";
@@ -55,6 +59,9 @@ enum Tabs {
   TODAY_RESULTS = "todayResults"
 }
 
+const EXTENSION_DEFAULT_WIDTH = 1022;
+const EXTENSION_WINDOW_SCALE_FACTOR = 0.95;
+
 export default defineComponent({
   name: "VideoOverlay",
   components: { TodayResults, OngoingMatch, WButton },
@@ -63,10 +70,25 @@ export default defineComponent({
     const battleTag = ref("");
     const currentSeason: Ref<number | null> = ref(null);
     const streamStartedAt = ref("");
+    const scaleFactor = ref(1);
 
     const currentTab: Ref<string> = ref(Tabs.CURRENT_MATCH);
     const tabs = [Tabs.CURRENT_MATCH, Tabs.TODAY_RESULTS];
     const isExtensionVisible = ref(false);
+    watch(
+      () => isExtensionVisible.value,
+      isVisible => {
+        if (isVisible) {
+          const extensionWindowWidth = document.getElementsByTagName("html")[0]
+            .offsetWidth;
+          scaleFactor.value = Math.min(
+            1,
+            (extensionWindowWidth * EXTENSION_WINDOW_SCALE_FACTOR) /
+              EXTENSION_DEFAULT_WIDTH
+          );
+        }
+      }
+    );
 
     onMounted(async () => {
       window.Twitch.ext.onAuthorized(
@@ -112,7 +134,8 @@ export default defineComponent({
         [Tabs.TODAY_RESULTS]: "Today results"
       },
       streamStartedAt,
-      currentSeason
+      currentSeason,
+      scaleFactor
     };
   }
 });
@@ -164,6 +187,7 @@ html {
   text-align: center;
   padding: 60px 60px 30px;
   margin: -8px auto 0;
+  transform-origin: top left;
 }
 
 .close-button {
