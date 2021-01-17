@@ -88,6 +88,8 @@ export default defineComponent({
 
 <style scoped lang="scss">
 .config-page {
+  background: white;
+
   &__disclaimer {
     background: #fb755d;
     padding: 10px;
