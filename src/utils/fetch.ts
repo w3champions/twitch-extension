@@ -82,7 +82,7 @@ export async function fetchPlayerStatsAgainstOpponent(
 }
 
 export async function authorizeWithTwitch(): Promise<TwitchToken> {
-  const url = `https://identification-service.test.w3champions.com/api/oauth/twitch`;
+  const url = `https://identification-service.w3champions.com/api/oauth/twitch`;
   const response = await fetch(url, {
     method: "GET",
     headers: {
