@@ -27,11 +27,13 @@ import { getRaceIcon } from "@/utils/assets";
 const leagues = [
   "grandmaster",
   "master",
+  "adept",
   "diamond",
   "platinum",
   "gold",
   "silver",
-  "bronze"
+  "bronze",
+  "grass"
 ];
 
 function calculateWinProbability(mmr1: number, mmr2: number): number {
@@ -98,10 +100,15 @@ export default {
       return calculateWinProbability(props.mmr, props.opponentMmr);
     });
     const rootClass = computed(() => {
-      return {
-        "player-ranking": true,
-        [`player-ranking--${leagues[props.leagueId]}`]: true
-      };
+      const classes = { "player-ranking": true };
+
+      if (leagues[props.leagueId]) {
+        Object.assign(classes, {
+          [`player-ranking--${leagues[props.leagueId]}`]: true
+        });
+      }
+
+      return classes;
     });
 
     return {
@@ -121,14 +128,14 @@ export default {
   position: relative;
   width: 265px;
   margin-top: 40px;
-  padding: 70px 14px 30px;
+  padding: 30px 14px;
   border: 1px solid var(--color-yellow);
 
   &::before {
     content: "";
     position: absolute;
-    width: 111px;
-    height: 117px;
+    width: 64px;
+    height: 64px;
     left: 50%;
     top: -40px;
     transform: translateX(-50%);
@@ -142,6 +149,10 @@ export default {
 
   &--master::before {
     background: url("../assets/leagues/master.png");
+  }
+
+  &--adept::before {
+    background: url("../assets/leagues/adept.png");
   }
 
   &--diamond::before {
@@ -162,6 +173,10 @@ export default {
 
   &--bronze::before {
     background: url("../assets/leagues/bronze.png");
+  }
+
+  &--grass::before {
+    background: url("../assets/leagues/grass.png");
   }
 
   &__name {
