@@ -17,24 +17,24 @@
         <div class="today-results__match-list">
           <div>
             <h3 class="today-results__wins">WINS:</h3>
-            <MatchResult
-              v-for="match in results.won"
-              :key="match.id"
-              :match="match"
-              :battle-tag="battleTag"
-              @click="selectedMatchId = match.id"
-            />
+            <Suspense v-for="match in results.won" :key="match.id">
+              <MatchResult
+                :match="match"
+                :battle-tag="battleTag"
+                @click="selectedMatchId = match.id"
+              />
+            </Suspense>
           </div>
 
           <div>
             <h3 class="today-results__losses">LOSSES:</h3>
-            <MatchResult
-              v-for="match in results.lost"
-              :key="match.id"
-              :match="match"
-              :battle-tag="battleTag"
-              @click="selectedMatchId = match.id"
-            />
+            <Suspense v-for="match in results.lost" :key="match.id">
+              <MatchResult
+                :match="match"
+                :battle-tag="battleTag"
+                @click="selectedMatchId = match.id"
+              />
+            </Suspense>
           </div>
         </div>
       </div>

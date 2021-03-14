@@ -1,6 +1,9 @@
 <template>
   <div :class="rootClass">
-    <div class="player-ranking__name">{{ name }}</div>
+    <div class="player-ranking__name">
+      <div class="player-ranking__display-name">{{ aka || name }}</div>
+      <div class="player-ranking__as" v-if="aka">as {{ name }}</div>
+    </div>
     <div class="player-ranking__race">
       <img :src="getRaceIcon(race)" width="50" height="50" />
     </div>
@@ -53,6 +56,7 @@ type Props = {
   opponentMmr: number;
   rankingPoints: number;
   leagueId: number;
+  aka: string | undefined;
 };
 
 export default {
@@ -93,6 +97,10 @@ export default {
     race: {
       type: Number,
       required: true
+    },
+    aka: {
+      type: String,
+      default: ""
     }
   },
   setup(props: Props) {
@@ -182,6 +190,8 @@ export default {
   &__name {
     color: var(--color-yellow);
     font-size: 24px;
+    height: 55px;
+    overflow: hidden;
   }
 
   &__league {
@@ -199,6 +209,10 @@ export default {
 
   &__losses {
     color: red;
+  }
+
+  &__as {
+    font-size: 12px;
   }
 }
 </style>

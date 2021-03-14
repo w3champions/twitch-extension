@@ -14,6 +14,7 @@
             :opponent-mmr="state.opponentStats.mmr"
             :rank="state.heroStats.rank"
             :race="state.heroStats.race"
+            :aka="playerAkas[state.hero.battleTag]"
           />
         </div>
         <div style="padding-top: 10px">
@@ -49,6 +50,7 @@
             :opponent-mmr="state.heroStats.mmr"
             :rank="state.opponentStats.rank"
             :race="state.opponentStats.race"
+            :aka="playerAkas[state.opponent.battleTag]"
           />
         </div>
       </template>
@@ -79,27 +81,33 @@
             <h3 style="color: green; margin-top: 0;">
               {{ state.hero.name }} won:
             </h3>
-            <MatchResult
+            <Suspense
               v-for="match in wonMatchesAgainstOpponent"
               :key="match.id"
-              :match="match"
-              :battle-tag="battleTag"
-              :with-opponent-name="false"
-              @click="selectedMatchId = match.id"
-            />
+            >
+              <MatchResult
+                :match="match"
+                :battle-tag="battleTag"
+                :with-opponent-name="false"
+                @click="selectedMatchId = match.id"
+              />
+            </Suspense>
           </div>
           <div style="text-align: left;overflow:auto;">
             <h3 style="color: red;margin-top: 0;">
               {{ state.hero.name }} lost:
             </h3>
-            <MatchResult
+            <Suspense
               v-for="match in lostMatchesAgainstOpponent"
               :key="match.id"
-              :match="match"
-              :battle-tag="battleTag"
-              :with-opponent-name="false"
-              @click="selectedMatchId = match.id"
-            />
+            >
+              <MatchResult
+                :match="match"
+                :battle-tag="battleTag"
+                :with-opponent-name="false"
+                @click="selectedMatchId = match.id"
+              />
+            </Suspense>
           </div>
         </div>
       </template>
@@ -135,6 +143,7 @@ import PlayerRanking from "@/components/PlayerRanking.vue";
 import WButton from "@/components/common/WButton.vue";
 import MatchResult from "@/components/MatchResult.vue";
 import RecentMatch from "@/components/RecentMatch.vue";
+import usePlayerAka from "@/composables/usePlayerAka";
 
 type Props = {
   battleTag: string;
@@ -168,6 +177,7 @@ export default defineComponent({
     const wonMatchesAgainstOpponent: Array<Match> = [];
     const lostMatchesAgainstOpponent: Array<Match> = [];
     const showVSDetails = ref(false);
+    const { fetchPlayerAka, playerAkas } = usePlayerAka();
 
     const state = reactive({
       ongoingMatch: null,
@@ -200,7 +210,9 @@ export default defineComponent({
               state.hero.battleTag,
               state.opponent.battleTag,
               props.currentSeason
-            )
+            ),
+            fetchPlayerAka(state.hero.battleTag),
+            fetchPlayerAka(state.opponent.battleTag)
           ]);
 
           state.heroStats = heroStats.find(
@@ -241,7 +253,8 @@ export default defineComponent({
       wonMatchesAgainstOpponent,
       lostMatchesAgainstOpponent,
       showVSDetails,
-      selectedMatchId
+      selectedMatchId,
+      playerAkas
     };
   }
 });

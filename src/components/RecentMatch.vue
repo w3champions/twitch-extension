@@ -28,7 +28,10 @@
         style="text-align: right;"
         :title="heroStats.name"
       >
-        {{ heroStats.name }}
+        <div>{{ playerAkas[battleTag] || heroStats.name }}</div>
+        <div v-if="playerAkas[battleTag]" class="player-name__as">
+          as {{ heroStats.name }}
+        </div>
       </div>
       <div class="race-icon">
         <img
@@ -52,7 +55,12 @@
         style="text-align: left;"
         :title="opponentStats.name"
       >
-        {{ opponentStats.name }}
+        <div>
+          {{ playerAkas[opponentStats.battleTag] || opponentStats.name }}
+        </div>
+        <div v-if="playerAkas[opponentStats.battleTag]" class="player-name__as">
+          as {{ opponentStats.name }}
+        </div>
       </div>
       <div class="mmr-stats" style="text-align: right;">
         <div>
@@ -258,6 +266,7 @@ import { heroNames, mapNames } from "@/constants/constants";
 import ScoreStat from "@/components/ScoreStat.vue";
 import { fetchMatchStats } from "@/utils/fetch";
 import MiniMap from "@/components/MiniMap.vue";
+import usePlayerAka from "@/composables/usePlayerAka";
 
 function getHeroIcon(hero: string) {
   return getAsset(`heroes/${hero}.png`);
@@ -282,6 +291,8 @@ export default defineComponent({
     }
   },
   setup(props: Props) {
+    const { fetchPlayerAka, playerAkas } = usePlayerAka();
+
     const state = reactive({ lastMatch: {} as MatchDetail });
     const heroStats = computed(() => {
       let heroPlayer;
@@ -332,7 +343,13 @@ export default defineComponent({
 
     onMounted(async () => {
       if (props.battleTag) {
-        state.lastMatch = await fetchMatchStats(props.matchId);
+        const [lastMatch] = await Promise.all([
+          fetchMatchStats(props.matchId),
+          fetchPlayerAka(props.battleTag)
+        ]);
+        state.lastMatch = lastMatch;
+        if (opponentStats.value)
+          await fetchPlayerAka(opponentStats.value.battleTag);
       }
     });
 
@@ -346,7 +363,8 @@ export default defineComponent({
       getHeroIcon,
       getRaceIcon,
       heroNames,
-      mapNames
+      mapNames,
+      playerAkas
     };
   }
 });
@@ -388,6 +406,10 @@ export default defineComponent({
   font-size: 28px;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  &__as {
+    font-size: 12px;
+  }
 }
 
 .game-stats-section {

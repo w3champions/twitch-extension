@@ -5,6 +5,7 @@ import {
   MatchDetail,
   ModeStat,
   OngoingMatch,
+  PlayerProfile,
   Season,
   TwitchStreamResponse,
   TwitchToken
@@ -116,6 +117,15 @@ export async function getStreamStatus(
 
 export async function fetchSeasons(): Promise<Season[]> {
   const url = "https://statistic-service.w3champions.com/api/ladder/seasons";
+  const response = await fetch(url);
+  return response.json();
+}
+
+export async function fetchPlayerProfile(
+  battleTag: string
+): Promise<PlayerProfile> {
+  const encodedBattleTag = encodeURIComponent(battleTag);
+  const url = `https://website-backend.w3champions.com/api/players/${encodedBattleTag}`;
   const response = await fetch(url);
   return response.json();
 }

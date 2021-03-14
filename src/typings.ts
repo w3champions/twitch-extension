@@ -213,3 +213,29 @@ export interface TwitchStreamStatus {
 export interface Season {
   id: number;
 }
+export type RaceStat = {
+  race: ERaceEnum;
+  gateWay: Gateways;
+  season: number;
+  wins: number;
+  losses: number;
+  games: number;
+  winrate: number;
+};
+
+export type AliasData = {
+  id: number;
+  name: string | null;
+  main_race: string | null;
+  country: string | null;
+  liquipedia: string | null;
+};
+
+export interface PlayerProfile {
+  id: string;
+  name: string;
+  battleTag: string;
+  participatedInSeasons: Season[];
+  winLosses: RaceStat[];
+  playerAkaData: AliasData;
+}
