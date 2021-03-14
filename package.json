@@ -1,11 +1,11 @@
 {
   "name": "w3champions-twitch",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "packDist": "yarn build && zip -r dist.zip dist/css dist/img dist/js dist/config.html dist/favicon.ico dist/video_overlay.html",
+    "packDist": "yarn build && cd dist && zip -r ../dist.zip ./*",
     "packSrc": "zip src.zip -r public/ src .browserslistrc .eslintignore .eslintrc.js .gitignore package.json README.md tsconfig.json vue.config.js w3champs-live.json yarn.lock",
     "lint": "vue-cli-service lint"
   },
