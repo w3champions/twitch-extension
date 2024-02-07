@@ -63,6 +63,7 @@ export enum Gateways {
 
 export interface Match {
   map: string;
+  mapName: string;
   id: number;
   durationInSeconds: number;
   number: number;
