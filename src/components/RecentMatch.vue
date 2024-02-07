@@ -241,16 +241,12 @@
           }}
         </div>
       </div>
+      <div></div>
       <div class="map-stats">
-        <div style="text-align: right">
-          Map:<br />
-          {{ mapNames[state.lastMatch.match.map] }}
+        <div style="text-align: center">
+          Map: {{ state.lastMatch.match.mapName }}
         </div>
-        <MiniMap :map="state.lastMatch.match.map" />
-        <div style="text-align: left">
-          Duration:<br />
-          {{ gameDuration }}
-        </div>
+        <div style="text-align: center">Duration: {{ gameDuration }}</div>
       </div>
     </div>
   </div>
@@ -262,10 +258,9 @@ import { MatchDetail } from "@/typings";
 import formatDuration from "date-fns/formatDuration";
 import intervalToDuration from "date-fns/intervalToDuration";
 import { getAsset, getRaceIcon } from "@/utils/assets";
-import { heroNames, mapNames } from "@/constants/constants";
+import { heroNames } from "@/constants/constants";
 import ScoreStat from "@/components/ScoreStat.vue";
 import { fetchMatchStats } from "@/utils/fetch";
-import MiniMap from "@/components/MiniMap.vue";
 import usePlayerAka from "@/composables/usePlayerAka";
 
 function getHeroIcon(hero: string) {
@@ -279,7 +274,7 @@ type Props = {
 
 export default defineComponent({
   name: "RecentMatch",
-  components: { MiniMap, ScoreStat },
+  components: { ScoreStat },
   props: {
     battleTag: {
       type: String,
@@ -363,7 +358,6 @@ export default defineComponent({
       getHeroIcon,
       getRaceIcon,
       heroNames,
-      mapNames,
       playerAkas
     };
   }
@@ -424,10 +418,8 @@ export default defineComponent({
 }
 
 .map-stats {
-  grid-column: 1/4;
-  display: grid;
-  grid-template-columns: 1fr 135px 1fr;
-  grid-column-gap: 12px;
+  display: flex;
+  flex-direction: column;
 }
 
 .heroes-stats {

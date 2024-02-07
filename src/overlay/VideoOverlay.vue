@@ -68,7 +68,7 @@ export default defineComponent({
   setup() {
     const state = reactive({ twitchConfig: {} as TwitchContext });
     const battleTag = ref("");
-    const currentSeason: Ref<number | null> = ref(null);
+    const currentSeason: Ref<number> = ref(0);
     const streamStartedAt = ref("");
     const scaleFactor = ref(1);
 

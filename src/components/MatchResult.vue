@@ -4,7 +4,7 @@
       {{ playerAkas[opponent.battleTag] || opponent.name }}
       <span v-if="playerAkas[opponent.battleTag]">as {{ opponent.name }}</span>
     </span>
-    on {{ mapNames[match.map] }} in
+    on {{ match.mapName }} in
     {{ formatMatchDuration(match.durationInSeconds) }}
     &rarr;
   </div>
@@ -13,7 +13,6 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { Match } from "@/typings";
-import { mapNames } from "@/constants/constants";
 import intervalToDuration from "date-fns/intervalToDuration";
 import usePlayerAka from "@/composables/usePlayerAka";
 type PropTypes = {
@@ -70,7 +69,6 @@ export default defineComponent({
     return {
       hero,
       opponent,
-      mapNames,
       formatMatchDuration,
       playerAkas
     };

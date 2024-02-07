@@ -21,7 +21,7 @@
               <MatchResult
                 :match="match"
                 :battle-tag="battleTag"
-                @click="selectedMatchId = match.id"
+                @click="selectedMatchId = match.id.toString()"
               />
             </Suspense>
           </div>
@@ -32,7 +32,7 @@
               <MatchResult
                 :match="match"
                 :battle-tag="battleTag"
-                @click="selectedMatchId = match.id"
+                @click="selectedMatchId = match.id.toString()"
               />
             </Suspense>
           </div>
@@ -127,7 +127,7 @@ export default defineComponent({
 .today-results {
   &__results {
     display: grid;
-    grid-template-columns: 200px 1fr;
+    grid-template-columns: 140px 1fr;
     grid-column-gap: 15px;
     height: 100%;
   }
