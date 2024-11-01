@@ -255,17 +255,13 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, reactive } from "vue";
 import { MatchDetail } from "@/typings";
-import formatDuration from "date-fns/formatDuration";
-import intervalToDuration from "date-fns/intervalToDuration";
-import { getAsset, getRaceIcon } from "@/utils/assets";
+import { formatDuration } from "date-fns/formatDuration";
+import { intervalToDuration } from "date-fns/intervalToDuration";
+import { getRaceIcon, getHeroIcon } from "@/utils/assets";
 import { heroNames } from "@/constants/constants";
 import ScoreStat from "@/components/ScoreStat.vue";
 import { fetchMatchStats } from "@/utils/fetch";
 import usePlayerAka from "@/composables/usePlayerAka";
-
-function getHeroIcon(hero: string) {
-  return getAsset(`heroes/${hero}.png`);
-}
 
 type Props = {
   battleTag: string;

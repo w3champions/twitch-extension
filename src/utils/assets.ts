@@ -1,7 +1,7 @@
 import { ERaceEnum } from "@/typings";
 
 export function getAsset(path: string) {
-  return require(`../assets/${path}`);
+  return new URL(`../assets/${path}`, import.meta.url).href;
 }
 
 export function getRaceIcon(race: ERaceEnum) {
@@ -15,4 +15,8 @@ export function getRaceIcon(race: ERaceEnum) {
   }[race];
 
   return getAsset(`races/${raceIconName}.png`);
+}
+
+export function getHeroIcon(hero: string) {
+  return getAsset(`heroes/${hero}.png`);
 }

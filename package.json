@@ -2,35 +2,33 @@
   "name": "w3champions-twitch",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview",
     "packDist": "yarn build && cd dist && zip -r ../dist.zip ./*",
-    "packSrc": "zip src.zip -r public/ src .browserslistrc .eslintignore .eslintrc.js .gitignore package.json README.md tsconfig.json vue.config.js w3champs-live.json yarn.lock",
-    "lint": "vue-cli-service lint"
+    "packSrc": "zip -r src.zip index.html favicon.ico src .browserslistrc .eslintignore .eslintrc.js .gitignore package.json README.md tsconfig.json vue.config.js w3champs-live.json yarn.lock",
+    "lint": "eslint --ext .js,.vue,.ts --ignore-path .gitignore --fix src"
   },
   "dependencies": {
-    "date-fns": "^2.16.1",
-    "vue": "^3.0.0"
+    "date-fns": "^4.1.0",
+    "vue": "^3.5.12"
   },
   "devDependencies": {
-    "@types/date-fns": "^2.6.0",
-    "@typescript-eslint/eslint-plugin": "^2.33.0",
-    "@typescript-eslint/parser": "^2.33.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-plugin-typescript": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
-    "@vue/compiler-sfc": "^3.0.0",
-    "@vue/eslint-config-prettier": "^6.0.0",
-    "@vue/eslint-config-typescript": "^5.0.2",
-    "eslint": "^6.7.2",
-    "eslint-plugin-prettier": "^3.1.3",
-    "eslint-plugin-vue": "^7.0.0-0",
-    "lint-staged": "^9.5.0",
-    "prettier": "^1.19.1",
-    "sass": "~1.32.13",
-    "sass-loader": "^10",
-    "typescript": "~3.9.3"
+    "@typescript-eslint/eslint-plugin": "^8.12.2",
+    "@typescript-eslint/parser": "^8.12.2",
+    "@vitejs/plugin-vue": "^5.1.4",
+    "@vue/eslint-config-prettier": "^10.1.0",
+    "@vue/eslint-config-typescript": "^14.1.3",
+    "eslint": "^9.14.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-vue": "^9.30.0",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3",
+    "sass": "^1.80.5",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.10"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"

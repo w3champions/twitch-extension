@@ -13,7 +13,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { Match } from "@/typings";
-import intervalToDuration from "date-fns/intervalToDuration";
+import { intervalToDuration } from "date-fns/intervalToDuration";
 import usePlayerAka from "@/composables/usePlayerAka";
 type PropTypes = {
   match: Match;

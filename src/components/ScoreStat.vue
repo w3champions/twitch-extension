@@ -18,10 +18,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-
-function getAsset(path: string) {
-  return require(`../assets/${path}`);
-}
+import { getAsset } from "@/utils/assets";
 
 export default defineComponent({
   name: "ScoreStatRow",
