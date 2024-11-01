@@ -14,7 +14,7 @@ import {
 export async function fetchMatchStats(matchId: string): Promise<MatchDetail> {
   const url = `https://statistic-service.w3champions.com/api/matches/${matchId}`;
   const response = await fetch(url);
-  return response.json();
+  return await response.json();
 }
 
 export async function fetchRecentMatches(
@@ -26,7 +26,7 @@ export async function fetchRecentMatches(
   const url = `https://statistic-service.w3champions.com/api/matches/search?playerId=${encodedBattleTag}&gateway=${Gateways.Europe}&offset=0&pageSize=${pageSize}&season=${season}&gameMode=${EGameMode.GM_1ON1}`;
 
   const response = await fetch(url);
-  return response.json();
+  return await response.json();
 }
 
 export async function fetchOngoingMatch(
@@ -38,10 +38,10 @@ export async function fetchOngoingMatch(
   const response = await fetch(url);
 
   if (response.status === 204) {
-    null;
+    return null;
   }
 
-  return response.json();
+  return await response.json();
 }
 
 export async function fetchPlayerStats(
@@ -54,7 +54,7 @@ export async function fetchPlayerStats(
     )}/game-mode-stats?gateWay=${Gateways.Europe}&season=${season}`
   );
 
-  return response.json();
+  return await response.json();
 }
 
 export async function fetchPlayerStatsAgainstOpponent(
@@ -79,7 +79,7 @@ export async function fetchPlayerStatsAgainstOpponent(
   const url = `https://statistic-service.w3champions.com/api/matches/search?${queryString}`;
 
   const response = await fetch(url);
-  return response.json();
+  return await response.json();
 }
 
 export async function authorizeWithTwitch(): Promise<TwitchToken> {
@@ -112,13 +112,13 @@ export async function getStreamStatus(
       Authorization: `Bearer ${token}`
     }
   });
-  return response.json();
+  return await response.json();
 }
 
 export async function fetchSeasons(): Promise<Season[]> {
   const url = "https://statistic-service.w3champions.com/api/ladder/seasons";
   const response = await fetch(url);
-  return response.json();
+  return await response.json();
 }
 
 export async function fetchPlayerProfile(
@@ -127,5 +127,5 @@ export async function fetchPlayerProfile(
   const encodedBattleTag = encodeURIComponent(battleTag);
   const url = `https://website-backend.w3champions.com/api/players/${encodedBattleTag}`;
   const response = await fetch(url);
-  return response.json();
+  return await response.json();
 }
