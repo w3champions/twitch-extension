@@ -128,6 +128,7 @@ export default defineComponent({
     grid-template-columns: 140px 1fr;
     grid-column-gap: 15px;
     height: 100%;
+    margin-top: 15px;
   }
 
   &__header {
@@ -160,10 +161,14 @@ export default defineComponent({
 
   &__wins {
     color: var(--color-green);
+    padding: 0 8px;
+    margin-bottom: 10px;
   }
 
   &__losses {
     color: var(--color-red);
+    padding: 0 8px;
+    margin-bottom: 10px;
   }
 }
 </style>

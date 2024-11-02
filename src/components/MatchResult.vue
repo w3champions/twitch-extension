@@ -79,5 +79,10 @@ export default defineComponent({
 <style lang="scss" scoped>
 .match-result {
   cursor: pointer;
+  padding: 4px 8px;
+}
+.match-result:hover {
+  background-color: #4444;
+  border-radius: 12px;
 }
 </style>
