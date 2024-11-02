@@ -37,10 +37,13 @@ You can create a `.env.local` file to override the Battle Tag during local devel
 VITE_BATTLE_TAG='YourUsername#1234'
 ```
 
-### Compiles and minifies for production
+### Build & Ship
 ```
-yarn build
+yarn packDist
 ```
+
+This produces the minified build with Vite to `dist/`, then packages it into a zip file
+named `dist.zip` that can be uploaded to Twitch.
 
 ### Lints and fixes files
 ```
