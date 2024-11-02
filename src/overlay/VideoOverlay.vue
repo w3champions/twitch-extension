@@ -1,7 +1,7 @@
 <template>
   <Transition name="slide-left">
     <button
-      v-if="state.twitchConfig.arePlayerControlsVisible"
+      v-if="$props.alwaysVisible || state.twitchConfig.arePlayerControlsVisible"
       class="overlay-toggle"
       @click="isExtensionVisible = !isExtensionVisible"
     />
@@ -65,11 +65,25 @@ const EXTENSION_WINDOW_SCALE_FACTOR = 0.95;
 export default defineComponent({
   name: "VideoOverlay",
   components: { TodayResults, OngoingMatch, WButton },
-  setup() {
+  props: {
+    battleTag: {
+      type: String,
+      required: false,
+      default: ""
+    },
+    alwaysVisible: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+  },
+  setup(props) {
     const state = reactive({ twitchConfig: {} as TwitchContext });
-    const battleTag = ref("");
     const currentSeason: Ref<number> = ref(0);
     const scaleFactor = ref(1);
+
+    // Can override with .env.local for testing, otherwise will use the extension's config
+    const battleTag = ref(props.battleTag);
 
     // Default to 24 hours ago, but will be overwritten by the actual stream start time
     const streamStartedAt = ref(new Date(new Date().getTime() - (24 * 60 * 60 * 1000)));
