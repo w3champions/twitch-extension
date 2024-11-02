@@ -8,10 +8,10 @@
     <template v-else>
       <div class="today-results__results">
         <div>
-          <h3 class="today-results__header">Today score</h3>
+          <h3 class="today-results__header">Today's score</h3>
           <p class="today-results__score">
             <span style="color: var(--color-green);">{{ results.won.length }}</span
-            >-<span style="color: var(--color-red);">{{ results.lost.length }}</span>
+            > - <span style="color: var(--color-red);">{{ results.lost.length }}</span>
           </p>
         </div>
         <div class="today-results__match-list">

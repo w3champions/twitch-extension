@@ -14,7 +14,9 @@
     >
       <button class="close-button" @click="isExtensionVisible = false" />
       <header class="header">
-        <div class="promo"></div>
+        <div class="header-battletag">
+          {{ battleTag }}
+        </div>
         <div class="header-tabs">
           <w-button
             v-for="tab in tabs"
@@ -288,11 +290,22 @@ html {
 }
 
 .header {
+  position: relative;
   display: grid;
-  grid-template-rows: 1fr 28px;
+  grid-template-rows: repeat(1, minmax(0, 1fr));;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-flow: column;
   grid-row-gap: 15px;
-  padding: 10px 0;
+  padding: 0 0 5px 0;
   background: url("../assets/header-logo-yellow.png") no-repeat center top;
+}
+
+.header-battletag {
+  display: flex;
+  height: 100%;
+  font-size: 24px;
+  align-items: center;
+  color: var(--color-yellow);
 }
 
 .header-tabs {
@@ -301,5 +314,6 @@ html {
   grid-column-gap: 10px;
   grid-auto-columns: min-content;
   justify-content: center;
+  margin-top: 45px;
 }
 </style>
