@@ -24,11 +24,11 @@
               v-if="state.matchHistory.length"
               class="ongoing-match__recent-encounters"
             >
-              <span style="color: green;">{{
+              <span style="color: var(--color-green);">{{
                 wonMatchesAgainstOpponent.length
               }}</span>
               -
-              <span style="color: red;">{{
+              <span style="color: var(--color-red);">{{
                 lostMatchesAgainstOpponent.length
               }}</span>
             </p>
@@ -69,16 +69,16 @@
             }}</span>
             <br />
             season {{ currentSeason }} <br />
-            <span style="color: green; font-size: 34px;">{{
+            <span style="color: var(--color-green); font-size: 34px;">{{
               wonMatchesAgainstOpponent.length
             }}</span
             ><span style="font-size: 34px;"> - </span>
-            <span style="color: red; font-size: 34px;">{{
+            <span style="color: var(--color-red); font-size: 34px;">{{
               lostMatchesAgainstOpponent.length
             }}</span>
           </div>
           <div style="text-align: left;overflow:auto;">
-            <h3 style="color: green; margin-top: 0;">
+            <h3 style="color: var(--color-green); margin-top: 0;">
               {{ state.hero.name }} won:
             </h3>
             <Suspense
@@ -94,7 +94,7 @@
             </Suspense>
           </div>
           <div style="text-align: left;overflow:auto;">
-            <h3 style="color: red;margin-top: 0;">
+            <h3 style="color: var(--color-red); margin-top: 0;">
               {{ state.hero.name }} lost:
             </h3>
             <Suspense

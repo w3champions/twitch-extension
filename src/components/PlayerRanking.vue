@@ -17,7 +17,7 @@
 
     <div>
       Win probability:
-      <span :style="{ color: winProbability >= 50 ? 'green' : 'red' }"
+      <span :style="{ color: winProbability >= 50 ? 'var(--color-green)' : 'var(--color-red)' }"
         >{{ winProbability }} %</span
       >
     </div>
@@ -206,11 +206,11 @@ export default {
   }
 
   &__wins {
-    color: green;
+    color: var(--color-green);
   }
 
   &__losses {
-    color: red;
+    color: var(--color-red);
   }
 
   &__as {

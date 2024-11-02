@@ -162,8 +162,8 @@ export default defineComponent({
 <style lang="scss">
 html {
   --color-yellow: #ffe033;
-  --color-green: #34c264;
-  --color-red: #bf301f;
+  --color-green: #4caf50;
+  --color-red: #ff5252;
   --color-gray: #83817e;
 
   font-family: "Spectral", serif;
