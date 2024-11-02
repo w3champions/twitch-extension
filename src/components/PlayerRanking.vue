@@ -5,7 +5,7 @@
       <div class="player-ranking__as" v-if="aka">as {{ name }}</div>
     </div>
     <div class="player-ranking__race">
-      <img :src="getRaceIcon(race)" width="50" height="50" />
+      <img :src="raceIcon" width="50" height="50" />
     </div>
 
     <div class="player-ranking__rank">
@@ -56,6 +56,7 @@ type Props = {
   opponentMmr: number;
   rankingPoints: number;
   leagueId: number;
+  race: number;
   aka: string | undefined;
 };
 
@@ -104,9 +105,9 @@ export default {
     }
   },
   setup(props: Props) {
-    const winProbability = computed(() => {
-      return calculateWinProbability(props.mmr, props.opponentMmr);
-    });
+    const winProbability = computed(() => calculateWinProbability(props.mmr, props.opponentMmr));
+    const raceIcon = computed(() => getRaceIcon(props.race));
+
     const rootClass = computed(() => {
       const classes = { "player-ranking": true };
 
@@ -123,6 +124,7 @@ export default {
       rootClass,
       leagues,
       winProbability,
+      raceIcon,
       getRaceIcon
     };
   }
