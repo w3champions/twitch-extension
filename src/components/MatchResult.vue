@@ -2,7 +2,7 @@
   <div v-if="hero && opponent" class="match-result">
     <span v-if="withOpponentName" style="color: var(--color-yellow)">
       {{ playerAkas[opponent.battleTag] || opponent.name }}
-      <span v-if="playerAkas[opponent.battleTag]">as {{ opponent.name }}</span>
+      <span v-if="playerAkas[opponent.battleTag]"> ({{ opponent.name }})</span>
     </span>
     on {{ match.mapName }} in
     {{ formatMatchDuration(match.durationInSeconds) }}

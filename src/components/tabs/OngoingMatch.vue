@@ -4,33 +4,35 @@
       <template v-if="!showVSDetails">
         <div class="ongoing-match__column">
           <PlayerRanking
-            v-if="state.heroStats"
-            :name="state.hero.name"
-            :league-id="state.heroStats.leagueId"
-            :wins="state.heroStats.wins"
-            :losses="state.heroStats.losses"
-            :ranking-points="state.heroStats.rankingPoints"
-            :mmr="state.heroStats.mmr"
+            v-if="state.streamerStats && state.streamer && state.opponentStats"
+            :name="state.streamer.name"
+            :league-id="state.streamerStats.leagueId"
+            :wins="state.streamerStats.wins"
+            :losses="state.streamerStats.losses"
+            :ranking-points="state.streamerStats.rankingPoints"
+            :mmr="state.streamerStats.mmr"
             :opponent-mmr="state.opponentStats.mmr"
-            :rank="state.heroStats.rank"
-            :race="state.heroStats.race"
-            :aka="playerAkas[state.hero.battleTag]"
+            :rank="state.streamerStats.rank"
+            :race="state.streamerStats.race"
+            :battle-tag="battleTag"
+            :aka="playerAkas[state.streamer.battleTag] ?? undefined"
           />
         </div>
-        <div style="padding-top: 10px">
+        <div>
+          <div style="margin-top: 40px; margin-bottom: 20px;">
+            Map: {{ state.ongoingMatch.mapName }}
+            <br />
+            {{ new Date(state.ongoingMatch.startTime).toLocaleString() }}
+          </div>
           <template v-if="state.matchHistory.length">
-            <h2>Encounters this season:</h2>
+            <h2>Head-to-head this season</h2>
             <p
               v-if="state.matchHistory.length"
               class="ongoing-match__recent-encounters"
             >
-              <span style="color: var(--color-green);">{{
-                wonMatchesAgainstOpponent.length
-              }}</span>
+              <span style="color: var(--color-green);">{{ wonMatchesAgainstOpponent.length }}</span>
               -
-              <span style="color: var(--color-red);">{{
-                lostMatchesAgainstOpponent.length
-              }}</span>
+              <span style="color: var(--color-red);">{{ lostMatchesAgainstOpponent.length }}</span>
             </p>
             <WButton @click="showVSDetails = true">Details</WButton>
           </template>
@@ -40,17 +42,18 @@
         </div>
         <div class="ongoing-match__column">
           <PlayerRanking
-            v-if="state.opponentStats"
+            v-if="state.opponentStats && state.opponent && state.streamerStats"
             :name="state.opponent.name"
             :league-id="state.opponentStats.leagueId"
             :wins="state.opponentStats.wins"
             :losses="state.opponentStats.losses"
             :ranking-points="state.opponentStats.rankingPoints"
             :mmr="state.opponentStats.mmr"
-            :opponent-mmr="state.heroStats.mmr"
+            :opponent-mmr="state.streamerStats.mmr"
             :rank="state.opponentStats.rank"
             :race="state.opponentStats.race"
-            :aka="playerAkas[state.opponent.battleTag]"
+            :battle-tag="state.opponent.battleTag"
+            :aka="playerAkas[state.opponent.battleTag] ?? undefined"
           />
         </div>
       </template>
@@ -60,26 +63,18 @@
             <WButton @click="showVSDetails = false">Back</WButton>
           </div>
           <div style="font-size: 24px;">
-            <span class="ongoing-match__player-name">{{
-              state.hero.name
-            }}</span>
+            <span class="ongoing-match__player-name">{{ state?.streamer?.name }}</span>
             vs
-            <span class="ongoing-match__player-name">{{
-              state.opponent.name
-            }}</span>
+            <span class="ongoing-match__player-name">{{ state?.opponent?.name }}</span>
             <br />
-            season {{ currentSeason }} <br />
-            <span style="color: var(--color-green); font-size: 34px;">{{
-              wonMatchesAgainstOpponent.length
-            }}</span
-            ><span style="font-size: 34px;"> - </span>
-            <span style="color: var(--color-red); font-size: 34px;">{{
-              lostMatchesAgainstOpponent.length
-            }}</span>
+            Season {{ currentSeason }} <br />
+            <span style="color: var(--color-green); font-size: 34px;">{{ wonMatchesAgainstOpponent.length }}</span>
+            <span style="font-size: 34px;"> - </span>
+            <span style="color: var(--color-red); font-size: 34px;">{{ lostMatchesAgainstOpponent.length }}</span>
           </div>
           <div style="text-align: left;overflow:auto;">
             <h3 style="color: var(--color-green); margin-top: 0;">
-              {{ state.hero.name }} won:
+              {{ state?.streamer?.name }} won:
             </h3>
             <Suspense
               v-for="match in wonMatchesAgainstOpponent"
@@ -95,7 +90,7 @@
           </div>
           <div style="text-align: left;overflow:auto;">
             <h3 style="color: var(--color-red); margin-top: 0;">
-              {{ state.hero.name }} lost:
+              {{ state?.streamer?.name }} lost:
             </h3>
             <Suspense
               v-for="match in lostMatchesAgainstOpponent"
@@ -152,8 +147,8 @@ type Props = {
 
 type State = {
   ongoingMatch: OngoingMatch | null;
-  hero: PlayerInTeam | null;
-  heroStats: ModeStat | null;
+  streamer: PlayerInTeam | null;
+  streamerStats: ModeStat | null;
   opponent: PlayerInTeam | null;
   opponentStats: ModeStat | null;
   matchHistory: Match[];
@@ -181,69 +176,65 @@ export default defineComponent({
 
     const state = reactive({
       ongoingMatch: null,
-      hero: null,
-      heroStats: null,
+      streamer: null,
+      streamerStats: null,
       opponent: null,
       opponentStats: null,
       matchHistory: []
     } as State);
 
     onMounted(async () => {
-      if (props.battleTag) {
-        const ongoingMatch = await fetchOngoingMatch(props.battleTag);
-        if (ongoingMatch && ongoingMatch.gameMode === EGameMode.GM_1ON1) {
-          state.ongoingMatch = ongoingMatch;
+      if (!props.battleTag) return;
 
-          const matchPlayers = state.ongoingMatch.teams.flatMap(t => t.players);
+      const ongoingMatch = await fetchOngoingMatch(props.battleTag);
+      if (!ongoingMatch || ongoingMatch.gameMode !== EGameMode.GM_1ON1) {
+        state.ongoingMatch = null;
+        return;
+      }
+      state.ongoingMatch = ongoingMatch;
 
-          state.hero = matchPlayers.find(
-            player => player.battleTag === props.battleTag
-          )!;
-          state.opponent = matchPlayers.find(
-            player => player.battleTag !== props.battleTag
-          )!;
+      const matchPlayers = state.ongoingMatch.teams.flatMap(t => t.players);
 
-          const [heroStats, opponentStats, matchHistory] = await Promise.all([
-            fetchPlayerStats(props.battleTag, props.currentSeason),
-            fetchPlayerStats(state.opponent!.battleTag, props.currentSeason),
-            fetchPlayerStatsAgainstOpponent(
-              state.hero.battleTag,
-              state.opponent.battleTag,
-              props.currentSeason
-            ),
-            fetchPlayerAka(state.hero.battleTag),
-            fetchPlayerAka(state.opponent.battleTag)
-          ]);
+      state.streamer = matchPlayers.find(player => player.battleTag === props.battleTag)!;
+      state.opponent = matchPlayers.find(player => player.battleTag !== props.battleTag)!;
 
-          state.heroStats = heroStats.find(
-            s => s.race === state.hero!.race && s.gameMode === EGameMode.GM_1ON1
-          )!;
-          state.opponentStats = opponentStats.find(
-            s =>
-              s.race === state.opponent!.race &&
-              s.gameMode === EGameMode.GM_1ON1
-          )!;
-          state.matchHistory = matchHistory.matches.filter(
-            match => match.gameMode === EGameMode.GM_1ON1
-          );
+      const [heroStats, opponentStats, matchHistory] = await Promise.all([
+        fetchPlayerStats(props.battleTag, props.currentSeason),
+        fetchPlayerStats(state.opponent!.battleTag, props.currentSeason),
+        fetchPlayerStatsAgainstOpponent(
+          state.streamer.battleTag,
+          state.opponent.battleTag,
+          props.currentSeason
+        ),
+        fetchPlayerAka(state.streamer.battleTag),
+        fetchPlayerAka(state.opponent.battleTag)
+      ]);
 
-          if (state.matchHistory.length) {
-            for (const match of state.matchHistory) {
-              for (const team of match.teams) {
-                for (const player of team.players) {
-                  if (player.battleTag === props.battleTag) {
-                    if (player.won) {
-                      wonMatchesAgainstOpponent.push(match);
-                    } else {
-                      lostMatchesAgainstOpponent.push(match);
-                    }
-                  }
+      state.streamerStats = heroStats.find(
+        s => s.race === state.streamer!.race && s.gameMode === EGameMode.GM_1ON1
+      )!;
+      state.opponentStats = opponentStats.find(
+        s =>
+          s.race === state.opponent!.race &&
+          s.gameMode === EGameMode.GM_1ON1
+      )!;
+      state.matchHistory = matchHistory.matches.filter(
+        match => match.gameMode === EGameMode.GM_1ON1
+      );
+
+      if (state.matchHistory.length) {
+        for (const match of state.matchHistory) {
+          for (const team of match.teams) {
+            for (const player of team.players) {
+              if (player.battleTag === props.battleTag) {
+                if (player.won) {
+                  wonMatchesAgainstOpponent.push(match);
+                } else {
+                  lostMatchesAgainstOpponent.push(match);
                 }
               }
             }
           }
-        } else {
-          state.ongoingMatch = null;
         }
       }
     });
@@ -264,7 +255,7 @@ export default defineComponent({
 .ongoing-match {
   display: grid;
   grid-template-columns: 1fr 200px 1fr;
-  grid-column-gap: 50px;
+  grid-column-gap: 20px;
 
   &__column {
     display: flex;

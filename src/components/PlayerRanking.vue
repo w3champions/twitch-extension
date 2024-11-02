@@ -1,19 +1,25 @@
 <template>
   <div :class="rootClass">
     <div class="player-ranking__name">
-      <div class="player-ranking__display-name">{{ aka || name }}</div>
-      <div class="player-ranking__as" v-if="aka">as {{ name }}</div>
+      <div class="player-ranking__name__main">
+        <a :href="`https://w3champions.com/player/${encodeURIComponent(battleTag)}`" target="_blank">{{ aka || name }}</a>
+      </div>
+      <div class="player-ranking__name__as" v-if="aka">as {{ name }}</div>
     </div>
     <div class="player-ranking__race">
       <img :src="raceIcon" width="50" height="50" />
     </div>
 
     <div class="player-ranking__rank">
-      Rank {{ rank }} | <span class="player-ranking__wins">{{ wins }}</span> -
+      <span v-if="rank !== 0">Rank {{ rank }}</span>
+      <span v-if="rank === 0">Unranked</span>
+      |
+      <span class="player-ranking__wins">{{ wins }}</span>
+      -
       <span class="player-ranking__losses">{{ losses }}</span>
     </div>
 
-    <div>MMR: {{ mmr }} | RP: {{ rankingPoints }}</div>
+    <div>MMR: {{ mmr }} | RP: {{ Math.round(rankingPoints * 10) / 10 }}</div>
 
     <div>
       Win probability:
@@ -57,6 +63,7 @@ type Props = {
   rankingPoints: number;
   leagueId: number;
   race: number;
+  battleTag: string;
   aka: string | undefined;
 };
 
@@ -98,6 +105,10 @@ export default defineComponent({
     race: {
       type: Number,
       required: true
+    },
+    battleTag: {
+      type: String,
+      default: ""
     },
     aka: {
       type: String,
@@ -191,9 +202,29 @@ export default defineComponent({
 
   &__name {
     color: var(--color-yellow);
-    font-size: 24px;
-    height: 55px;
-    overflow: hidden;
+    font-weight: bold;
+    text-overflow: ellipsis;
+
+    a {
+      vertical-align: middle;  
+      text-decoration: none;
+      color: var(--color-yellow);
+      padding: 0 8px;
+      margin: 0 -8px;
+      &:hover {
+        border-radius: 10px;
+        background-color: #4447;
+      }
+    }
+
+    &__main {
+      font-size: 28px;
+    }
+
+    &__as {
+      margin-top: -8px;
+      font-size: 12px;
+    }
   }
 
   &__league {

@@ -15,7 +15,7 @@
       <button class="close-button" @click="isExtensionVisible = false" />
       <header class="header">
         <div class="header-battletag">
-          {{ battleTag }}
+          <a :href="`https://w3champions.com/player/${encodeURIComponent(battleTag)}`" target="_blank">{{ battleTag }}</a>
         </div>
         <div class="header-tabs">
           <w-button
@@ -302,10 +302,20 @@ html {
 
 .header-battletag {
   display: flex;
-  height: 100%;
-  font-size: 24px;
   align-items: center;
-  color: var(--color-yellow);
+  height: 100%;
+
+  a {
+    vertical-align: middle;
+    font-size: 24px;
+    text-decoration: none;
+    color: var(--color-yellow);
+    padding: 0 8px;
+    &:hover {
+      border-radius: 10px;
+      background-color: #4447;
+    }
+  }
 }
 
 .header-tabs {
