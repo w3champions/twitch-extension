@@ -52,7 +52,7 @@ import RecentMatch from "@/components/RecentMatch.vue";
 import WButton from "@/components/common/WButton.vue";
 
 type Props = {
-  streamStartedAt: string;
+  streamStartedAt: Date;
   battleTag: string;
   currentSeason: number;
 };
@@ -62,7 +62,7 @@ export default defineComponent({
   components: { WButton, RecentMatch, MatchResult },
   props: {
     streamStartedAt: {
-      type: String,
+      type: Date,
       required: true
     },
     battleTag: {
@@ -85,12 +85,10 @@ export default defineComponent({
         props.currentSeason,
         pageSize
       );
-      const streamStartedAtDate = new Date(props.streamStartedAt);
-
       state.todayMatches = matches.matches.filter(
         match =>
           match.gameMode === EGameMode.GM_1ON1 &&
-          isAfter(new Date(match.startTime), streamStartedAtDate)
+          isAfter(new Date(match.startTime), props.streamStartedAt)
       );
     });
 

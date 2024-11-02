@@ -69,8 +69,10 @@ export default defineComponent({
     const state = reactive({ twitchConfig: {} as TwitchContext });
     const battleTag = ref("");
     const currentSeason: Ref<number> = ref(0);
-    const streamStartedAt = ref("");
     const scaleFactor = ref(1);
+
+    // Default to 24 hours ago, but will be overwritten by the actual stream start time
+    const streamStartedAt = ref(new Date(new Date().getTime() - (24 * 60 * 60 * 1000)));
 
     const currentTab: Ref<string> = ref(Tabs.CURRENT_MATCH);
     const tabs = [Tabs.CURRENT_MATCH, Tabs.TODAY_RESULTS];
@@ -101,7 +103,9 @@ export default defineComponent({
           const channelStatus = streamStatus.data.find(
             stream => stream.user_id === channelId
           );
-          streamStartedAt.value = channelStatus!.started_at;
+          if (channelStatus) {
+            streamStartedAt.value = new Date(channelStatus.started_at);
+          }
         }
       );
 
