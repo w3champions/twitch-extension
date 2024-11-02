@@ -13,30 +13,12 @@
     <link rel="icon" href="/favicon.ico">
 
     <title>W3Champions Twitch Extension</title>
-    <style>
-      body {
-        font-family: 'Spectral', serif;
-        color: white;
-        background-color: #333;
-      }
-      a {
-        padding: 20px;
-        color: white;
-        font-size: xx-large;
-      }
-    </style>
   </head>
-  <body style="background-color: #333;">
+  <body>
     <noscript>
       <strong>We're sorry but this doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
-    <div>
-      <p>
-        <a href="/config.html">Config</a>
-      </p>
-      <p>
-        <a href="/video_overlay.html">Overlay</a>
-      </p>
-    </div>
+    <div id="app"></div>
+    <script type="module" src="/src/overlay/index.ts"></script>
   </body>
 </html>
