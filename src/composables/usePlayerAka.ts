@@ -7,7 +7,6 @@ export default function() {
   async function fetchPlayerAka(battleTag: string) {
     if (!Object.prototype.hasOwnProperty.call(playerAkas, battleTag)) {
       const profile = await fetchPlayerProfile(battleTag);
-
       playerAkas[battleTag] = profile.playerAkaData.name;
     }
   }

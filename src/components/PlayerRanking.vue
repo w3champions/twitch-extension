@@ -24,7 +24,7 @@
   </div>
 </template>
 <script lang="ts">
-import { computed } from "vue";
+import { computed, defineComponent } from "vue";
 import { getRaceIcon } from "@/utils/assets";
 
 const leagues = [
@@ -60,7 +60,7 @@ type Props = {
   aka: string | undefined;
 };
 
-export default {
+export default defineComponent({
   name: "PlayerRanking",
   props: {
     name: {
@@ -128,7 +128,7 @@ export default {
       getRaceIcon
     };
   }
-};
+});
 </script>
 
 <style lang="scss" scoped>

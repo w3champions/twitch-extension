@@ -1,3 +1,4 @@
+import { TwitchClientID } from "@/constants/constants";
 import {
   EGameMode,
   Gateways,
@@ -108,7 +109,7 @@ export async function getStreamStatus(
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
-      "Client-ID": "38ac0gifyt5khcuq23h2p8zpcqosbc",
+      "Client-ID": TwitchClientID,
       Authorization: `Bearer ${token}`
     }
   });

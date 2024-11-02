@@ -4,11 +4,11 @@
       {{ stat1 }}
     </div>
     <div>
-      <img :src="getIcon(icon)" width="16" height="16" :alt="icon" />
+      <img :src="getStatIcon(icon)" width="16" height="16" :alt="icon" />
     </div>
     <div>{{ title }}</div>
     <div>
-      <img :src="getIcon(icon)" width="16" height="16" :alt="icon" />
+      <img :src="getStatIcon(icon)" width="16" height="16" :alt="icon" />
     </div>
     <div style="text-align: left" :style="{ color: stat2Color }">
       {{ stat2 }}
@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { getAsset } from "@/utils/assets";
+import { getStatIcon } from "@/utils/assets";
 
 export default defineComponent({
   name: "ScoreStatRow",
@@ -46,29 +46,17 @@ export default defineComponent({
   },
   computed: {
     stat1Color(): string {
-      if (this.stat1 > this.stat2) {
-        return "var(--color-green)";
-      } else if (this.stat1 === this.stat2) {
-        return "white";
-      } else {
-        return "var(--color-red)";
-      }
+      if (this.stat1 === this.stat2) return "white";
+      return this.stat1 > this.stat2 ? "var(--color-green)" : "var(--color-red)";
     },
     stat2Color(): string {
-      if (this.stat1 < this.stat2) {
-        return "var(--color-green)";
-      } else if (this.stat1 === this.stat2) {
-        return "white";
-      } else {
-        return "var(--color-red)";
-      }
-    }
+      if (this.stat1 === this.stat2) return "white";
+      return this.stat1 < this.stat2 ? "var(--color-green)" : "var(--color-red)";
+    },
   },
   methods: {
-    getIcon(icon: string) {
-      return getAsset(`${icon}-icon.png`);
-    }
-  }
+    getStatIcon,
+  },
 });
 </script>
 

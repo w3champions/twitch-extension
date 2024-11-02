@@ -26,3 +26,6 @@ export const heroNames = {
   tinker: "Goblin Tinker",
   warden: "Warden"
 };
+
+// The twitch extension's ID
+export const TwitchClientID = "38ac0gifyt5khcuq23h2p8zpcqosbc";

@@ -1,3 +1,5 @@
+import type { heroNames } from "./constants/constants";
+
 export enum Segment {
   Global = "global",
   Developer = "developer",
@@ -64,7 +66,7 @@ export enum Gateways {
 export interface Match {
   map: string;
   mapName: string;
-  id: number;
+  id: string;
   durationInSeconds: number;
   number: number;
   startTime: string;
@@ -87,7 +89,7 @@ export interface UnitScore {
 }
 
 export interface Hero {
-  icon: string;
+  icon: keyof typeof heroNames;
   level: number;
 }
 

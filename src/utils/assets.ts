@@ -20,3 +20,11 @@ export function getRaceIcon(race: ERaceEnum) {
 export function getHeroIcon(hero: string) {
   return getAsset(`heroes/${hero}.png`);
 }
+
+export function getStatIcon(icon: string) {
+  return getAsset(`${icon}-icon.png`);
+}
+
+export function getMinimap(map: string) {
+  return getAsset(`maps/${map}.png`);
+}

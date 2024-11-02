@@ -113,7 +113,7 @@
       </template>
       <template v-if="showVSDetails && selectedMatchId">
         <div style="grid-column: 1/4">
-          <WButton @click="selectedMatchId = 0">Back</WButton>
+          <WButton @click="selectedMatchId = ''">Back</WButton>
 
           <RecentMatch :match-id="selectedMatchId" :battle-tag="battleTag" />
         </div>
@@ -173,7 +173,7 @@ export default defineComponent({
     }
   },
   setup(props: Props) {
-    const selectedMatchId = ref(0);
+    const selectedMatchId = ref("");
     const wonMatchesAgainstOpponent: Array<Match> = [];
     const lostMatchesAgainstOpponent: Array<Match> = [];
     const showVSDetails = ref(false);
@@ -254,7 +254,7 @@ export default defineComponent({
       lostMatchesAgainstOpponent,
       showVSDetails,
       selectedMatchId,
-      playerAkas
+      playerAkas,
     };
   }
 });

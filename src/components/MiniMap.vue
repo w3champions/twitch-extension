@@ -6,11 +6,7 @@
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";
-import { getAsset } from "@/utils/assets";
-
-function getMinimap(map: string) {
-  return getAsset(`maps/${map}.png`);
-}
+import { getMinimap } from "@/utils/assets";
 
 export default defineComponent({
   name: "MiniMap",
