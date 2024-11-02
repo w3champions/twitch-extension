@@ -24,3 +24,5 @@ pnpm-debug.log*
 
 # env
 w3champs-live.json
+dist.zip
+src.zip

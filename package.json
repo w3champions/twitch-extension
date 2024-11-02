@@ -8,7 +8,7 @@
     "build": "vite build",
     "serve": "vite preview",
     "packDist": "yarn build && cd dist && zip -r ../dist.zip ./*",
-    "packSrc": "zip -r src.zip index.html favicon.ico src .browserslistrc .eslintignore .eslintrc.js .gitignore package.json README.md tsconfig.json vue.config.js w3champs-live.json yarn.lock",
+    "packSrc": "zip -r src.zip src *.html favicon.ico .browserslistrc .eslintignore .eslintrc.js .gitignore package.json README.md tsconfig.json vite.config.js w3champs-live.json yarn.lock",
     "lint": "eslint --ext .js,.vue,.ts --ignore-path .gitignore --fix src"
   },
   "dependencies": {
