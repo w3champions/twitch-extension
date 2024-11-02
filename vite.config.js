@@ -24,8 +24,8 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        config: resolve(__dirname, './src/config/index.html'),
-        video_overlay: resolve(__dirname, './src/overlay/index.html'),
+        config: resolve(__dirname, './config.html'),
+        video_overlay: resolve(__dirname, './video_overlay.html'),
       }
     }
   },
