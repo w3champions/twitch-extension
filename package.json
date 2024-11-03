@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "rm -rf dist/ && vite build",
     "serve": "vite preview",
-    "packDist": "yarn build && cd dist && zip -r ../dist.zip ./*",
-    "packSrc": "zip -r src.zip src *.html favicon.ico .browserslistrc .eslintignore .eslintrc.js .gitignore package.json README.md tsconfig.json vite.config.js w3champs-live.json yarn.lock",
+    "packDist": "rm -f dist.zip && yarn build && cd dist/ && zip -r ../dist.zip ./*",
+    "packSrc": "rm -f src.zip && zip -r src.zip src *.html favicon.ico .browserslistrc .eslintignore .eslintrc.js .gitignore package.json README.md tsconfig.json vite.config.js w3champs-live.json yarn.lock",
     "lint": "eslint --ext .js,.vue,.ts --ignore-path .gitignore --fix src"
   },
   "dependencies": {
