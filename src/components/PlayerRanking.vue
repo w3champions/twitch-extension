@@ -10,7 +10,7 @@
       <img :src="raceIcon" width="50" height="50" />
     </div>
 
-    <div class="player-ranking__league">
+    <div v-if="$props.stats.rank !== 0" class="player-ranking__league">
       {{ leagues[$props.stats.leagueOrder] }} {{ $props.stats.division > 0 ? $props.stats.division : "" }}
     </div>
     <div class="player-ranking__rank">
