@@ -1,7 +1,7 @@
 <template>
-  <div class="ongoing-match">
+  <div class="ongoing-match-container">
     <template v-if="state.ongoingMatch">
-      <div class="ongoing-match-container">
+      <div class="ongoing-match">
         <template v-if="!showVSDetails">
           <div class="ongoing-match__column">
             <PlayerRanking
@@ -15,9 +15,9 @@
           </div>
           <div>
             <div style="margin-top: 40px; margin-bottom: 20px;">
-              Map: {{ state.ongoingMatch.mapName }}
+              <span class="gray">Map:</span> {{ state.ongoingMatch.mapName }}
               <br />
-              {{ new Date(state.ongoingMatch.startTime).toLocaleString() }}
+              <span class="gray">Start:</span> <relative-time :time="state.ongoingMatch.startTime" />
             </div>
             <template v-if="state.matchHistory.length">
               <h2>Head-to-head this season</h2>
@@ -69,7 +69,7 @@
                 <MatchResult
                   :match="match"
                   :battle-tag="battleTag"
-                  :with-opponent-name="false"
+                  :head-to-head="true"
                   @click="selectedMatchId = match.id"
                 />
               </Suspense>
@@ -85,7 +85,7 @@
                 <MatchResult
                   :match="match"
                   :battle-tag="battleTag"
-                  :with-opponent-name="false"
+                  :head-to-head="true"
                   @click="selectedMatchId = match.id"
                 />
               </Suspense>
@@ -108,7 +108,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, ref } from "vue";
+import { defineComponent, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import {
   fetchOngoingMatch,
   fetchPlayerStats,
@@ -126,6 +126,7 @@ import WButton from "@/components/WButton.vue";
 import MatchResult from "@/components/MatchResult.vue";
 import RecentMatch from "@/components/RecentMatch.vue";
 import usePlayerAka from "@/composables/usePlayerAka";
+import RelativeTime from "@/components/RelativeTime.vue";
 
 type Props = {
   battleTag: string;
@@ -143,7 +144,7 @@ type State = {
 
 export default defineComponent({
   name: "OngoingMatch",
-  components: { WButton, PlayerRanking, MatchResult, RecentMatch },
+  components: { WButton, PlayerRanking, MatchResult, RecentMatch, RelativeTime },
   props: {
     battleTag: {
       type: String,
@@ -155,6 +156,7 @@ export default defineComponent({
     }
   },
   setup(props: Props) {
+    const timer = ref(0);
     const selectedMatchId = ref("");
     const wonMatchesAgainstOpponent: Array<Match> = [];
     const lostMatchesAgainstOpponent: Array<Match> = [];
@@ -170,14 +172,13 @@ export default defineComponent({
       matchHistory: []
     } as State);
 
-    onMounted(async () => {
-      if (!props.battleTag) return;
-
+    const loadOngoingMatch = async () => {
       const ongoingMatch = await fetchOngoingMatch(props.battleTag);
       if (!ongoingMatch || ongoingMatch.gameMode !== EGameMode.GM_1ON1) {
         state.ongoingMatch = null;
         return;
       }
+      if (state.ongoingMatch?.id === ongoingMatch.id) return;
       state.ongoingMatch = ongoingMatch;
 
       const matchPlayers = state.ongoingMatch.teams.flatMap(t => t.players);
@@ -221,6 +222,16 @@ export default defineComponent({
           }
         }
       }
+    };
+
+    onMounted(async () => {
+      if (!props.battleTag) return;
+      await loadOngoingMatch();
+      timer.value = setInterval(loadOngoingMatch, 30 * 1000);
+    });
+
+    onBeforeUnmount(() => {
+      clearInterval(timer.value);
     });
 
     return {
@@ -236,8 +247,8 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.ongoing-match {
-  .ongoing-match-container {
+.ongoing-match-container {
+  .ongoing-match {
     display: grid;
     grid-template-columns: 1fr 200px 1fr;
     grid-column-gap: 20px;

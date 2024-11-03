@@ -125,6 +125,7 @@ export default defineComponent({
   margin-top: 40px;
   padding: 30px 14px;
   border: 1px solid var(--color-yellow);
+  border-radius: 10px;
 
   &::before {
     content: "";

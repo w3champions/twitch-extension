@@ -17,9 +17,9 @@
             <h3 class="today-results__header-mmr">MMR Today</h3>
             <p class="today-results__mmr">
               <span class="gray">{{ currentMmr }}</span>
-              <span :style="{color: mmrChange > 0 ? 'var(--color-green)' : 'var(--color-red)'}">
-                ({{ mmrChange > 0 ? "+" : "" }}{{ mmrChange }})
-              </span>
+              <span :style="{
+                color: mmrChange > 0 ? 'var(--color-green)' : 'var(--color-red)'
+              }"> ({{ mmrChange > 0 ? "+" : "" }}{{ mmrChange }})</span>
             </p>
           </template>
         </div>
