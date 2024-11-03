@@ -61,7 +61,7 @@ type Props = {
   mmr: number;
   opponentMmr: number;
   rankingPoints: number;
-  leagueId: number;
+  leagueOrder: number;
   race: number;
   battleTag: string;
   aka: string | undefined;
@@ -98,7 +98,7 @@ export default defineComponent({
       type: Number,
       default: 0
     },
-    leagueId: {
+    leagueOrder: {
       type: Number,
       required: true
     },
@@ -122,9 +122,9 @@ export default defineComponent({
     const rootClass = computed(() => {
       const classes = { "player-ranking": true };
 
-      if (leagues[props.leagueId]) {
+      if (leagues[props.leagueOrder] && props.rank > 0) {
         Object.assign(classes, {
-          [`player-ranking--${leagues[props.leagueId]}`]: true
+          [`player-ranking--${leagues[props.leagueOrder]}`]: true
         });
       }
 

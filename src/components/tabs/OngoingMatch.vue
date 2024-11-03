@@ -6,7 +6,7 @@
           <PlayerRanking
             v-if="state.streamerStats && state.streamer && state.opponentStats"
             :name="state.streamer.name"
-            :league-id="state.streamerStats.leagueId"
+            :league-order="state.streamerStats.leagueOrder"
             :wins="state.streamerStats.wins"
             :losses="state.streamerStats.losses"
             :ranking-points="state.streamerStats.rankingPoints"
@@ -14,7 +14,7 @@
             :opponent-mmr="state.opponentStats.mmr"
             :rank="state.streamerStats.rank"
             :race="state.streamerStats.race"
-            :battle-tag="battleTag"
+            :battle-tag="state.streamer.battleTag"
             :aka="playerAkas[state.streamer.battleTag] ?? undefined"
           />
         </div>
@@ -26,25 +26,22 @@
           </div>
           <template v-if="state.matchHistory.length">
             <h2>Head-to-head this season</h2>
-            <p
-              v-if="state.matchHistory.length"
-              class="ongoing-match__recent-encounters"
-            >
+            <div class="ongoing-match__recent-encounters">
               <span style="color: var(--color-green);">{{ wonMatchesAgainstOpponent.length }}</span>
               -
               <span style="color: var(--color-red);">{{ lostMatchesAgainstOpponent.length }}</span>
-            </p>
+            </div>
             <WButton @click="showVSDetails = true">Details</WButton>
           </template>
-          <p v-else>
+          <h2 v-else>
             No encounters this season
-          </p>
+          </h2>
         </div>
         <div class="ongoing-match__column">
           <PlayerRanking
             v-if="state.opponentStats && state.opponent && state.streamerStats"
             :name="state.opponent.name"
-            :league-id="state.opponentStats.leagueId"
+            :league-order="state.opponentStats.leagueOrder"
             :wins="state.opponentStats.wins"
             :losses="state.opponentStats.losses"
             :ranking-points="state.opponentStats.rankingPoints"
