@@ -2,24 +2,27 @@
   <div :class="rootClass">
     <div class="player-ranking__name">
       <div class="player-ranking__name__main">
-        <a :href="`https://w3champions.com/player/${encodeURIComponent(battleTag)}`" target="_blank">{{ aka || name }}</a>
+        <a :href="`https://w3champions.com/player/${encodeURIComponent($props.player.battleTag)}`" target="_blank">{{ aka || $props.player.name }}</a>
       </div>
-      <div class="player-ranking__name__as" v-if="aka">as {{ name }}</div>
+      <div class="player-ranking__name__as" v-if="aka">as {{ $props.player.name }}</div>
     </div>
     <div class="player-ranking__race">
       <img :src="raceIcon" width="50" height="50" />
     </div>
 
+    <div class="player-ranking__league">
+      {{ leagues[$props.stats.leagueOrder] }} {{ $props.stats.division > 0 ? $props.stats.division : "" }}
+    </div>
     <div class="player-ranking__rank">
-      <span v-if="rank !== 0">Rank {{ rank }}</span>
-      <span v-if="rank === 0">Unranked</span>
+      <span v-if="$props.stats.rank !== 0">Rank {{ $props.stats.rank }}</span>
+      <span v-if="$props.stats.rank === 0">Unranked</span>
       |
-      <span class="player-ranking__wins">{{ wins }}</span>
+      <span class="player-ranking__wins">{{ $props.stats.wins }}</span>
       -
-      <span class="player-ranking__losses">{{ losses }}</span>
+      <span class="player-ranking__losses">{{ $props.stats.losses }}</span>
     </div>
 
-    <div>MMR: {{ mmr }} | RP: {{ Math.round(rankingPoints * 10) / 10 }}</div>
+    <div><span class="gray">MMR:</span> {{ $props.stats.mmr }} | <span class="gray">RP:</span> {{ Math.round($props.stats.rankingPoints * 10) / 10 }}</div>
 
     <div>
       Win probability:
@@ -32,6 +35,7 @@
 <script lang="ts">
 import { computed, defineComponent } from "vue";
 import { getRaceIcon } from "@/utils/assets";
+import { ModeStat, PlayerInTeam } from "@/typings";
 
 const leagues = [
   "grandmaster",
@@ -54,61 +58,31 @@ function calculateWinProbability(mmr1: number, mmr2: number): number {
 }
 
 type Props = {
-  name: string;
-  wins: number;
-  losses: number;
-  rank: number;
-  mmr: number;
-  opponentMmr: number;
-  rankingPoints: number;
-  leagueOrder: number;
-  race: number;
-  battleTag: string;
+  player: PlayerInTeam;
+  stats: ModeStat;
+  opponent: PlayerInTeam;
+  opponentStats: ModeStat;
   aka: string | undefined;
 };
 
 export default defineComponent({
   name: "PlayerRanking",
   props: {
-    name: {
-      type: String,
+    player: {
+      type: Object as () => PlayerInTeam,
       required: true
     },
-    wins: {
-      type: Number,
-      default: 0
-    },
-    losses: {
-      type: Number,
-      default: 0
-    },
-    rank: {
-      type: Number,
-      default: 0
-    },
-    mmr: {
-      type: Number,
-      default: 0
-    },
-    opponentMmr: {
-      type: Number,
-      default: 0
-    },
-    rankingPoints: {
-      type: Number,
-      default: 0
-    },
-    leagueOrder: {
-      type: Number,
+    stats: {
+      type: Object as () => ModeStat,
       required: true
     },
-    race: {
-      type: Number,
+    opponent: {
+      type: Object as () => PlayerInTeam,
       required: true
     },
-    battleTag: {
-      type: String,
-      default: ""
+    opponentStats: {
+      type: Object as () => ModeStat,
+      required: true
     },
     aka: {
       type: String,
@@ -116,15 +90,15 @@ export default defineComponent({
     }
   },
   setup(props: Props) {
-    const winProbability = computed(() => calculateWinProbability(props.mmr, props.opponentMmr));
-    const raceIcon = computed(() => getRaceIcon(props.race));
+    const winProbability = computed(() => calculateWinProbability(props.stats.mmr, props.opponentStats.mmr));
+    const raceIcon = computed(() => getRaceIcon(props.stats.race));
 
     const rootClass = computed(() => {
       const classes = { "player-ranking": true };
 
-      if (leagues[props.leagueOrder] && props.rank > 0) {
+      if (leagues[props.stats.leagueOrder] && props.stats.rank > 0) {
         Object.assign(classes, {
-          [`player-ranking--${leagues[props.leagueOrder]}`]: true
+          [`player-ranking--${leagues[props.stats.leagueOrder]}`]: true
         });
       }
 
@@ -228,7 +202,8 @@ export default defineComponent({
   }
 
   &__league {
-    font-size: 16px;
+    font-size: 20px;
+    font-weight: bold;
     text-transform: uppercase;
   }
 

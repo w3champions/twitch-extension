@@ -166,7 +166,7 @@ html {
   --color-yellow: #ffe033;
   --color-green: #4caf50;
   --color-red: #ff5252;
-  --color-gray: #83817e;
+  --color-gray: #aeaeae;
 
   font-family: "Spectral", serif;
 }

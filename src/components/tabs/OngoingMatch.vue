@@ -4,17 +4,11 @@
       <template v-if="!showVSDetails">
         <div class="ongoing-match__column">
           <PlayerRanking
-            v-if="state.streamerStats && state.streamer && state.opponentStats"
-            :name="state.streamer.name"
-            :league-order="state.streamerStats.leagueOrder"
-            :wins="state.streamerStats.wins"
-            :losses="state.streamerStats.losses"
-            :ranking-points="state.streamerStats.rankingPoints"
-            :mmr="state.streamerStats.mmr"
-            :opponent-mmr="state.opponentStats.mmr"
-            :rank="state.streamerStats.rank"
-            :race="state.streamerStats.race"
-            :battle-tag="state.streamer.battleTag"
+            v-if="state.streamerStats && state.streamer && state.opponentStats && state.opponent"
+            :player="state.streamer"
+            :stats="state.streamerStats"
+            :opponent="state.opponent"
+            :opponent-stats="state.opponentStats"
             :aka="playerAkas[state.streamer.battleTag] ?? undefined"
           />
         </div>
@@ -39,17 +33,11 @@
         </div>
         <div class="ongoing-match__column">
           <PlayerRanking
-            v-if="state.opponentStats && state.opponent && state.streamerStats"
-            :name="state.opponent.name"
-            :league-order="state.opponentStats.leagueOrder"
-            :wins="state.opponentStats.wins"
-            :losses="state.opponentStats.losses"
-            :ranking-points="state.opponentStats.rankingPoints"
-            :mmr="state.opponentStats.mmr"
-            :opponent-mmr="state.streamerStats.mmr"
-            :rank="state.opponentStats.rank"
-            :race="state.opponentStats.race"
-            :battle-tag="state.opponent.battleTag"
+            v-if="state.opponentStats && state.opponent && state.streamerStats && state.streamer"
+            :player="state.opponent"
+            :stats="state.opponentStats"
+            :opponent="state.streamer"
+            :opponent-stats="state.streamerStats"
             :aka="playerAkas[state.opponent.battleTag] ?? undefined"
           />
         </div>
