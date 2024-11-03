@@ -47,9 +47,9 @@
           </div>
         </div>
       </div>
-      <div v-else>
-        <p>No matches played today</p>
-      </div>
+      <h2 v-else>
+        No matches played today
+      </h2>
     </template>
   </div>
 </template>
