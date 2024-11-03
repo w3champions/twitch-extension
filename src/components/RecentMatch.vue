@@ -13,7 +13,7 @@
       </div>
       <div class="race-icon">
         <img
-          :src="getRaceIcon(streamerStats.race)"
+          :src="getRaceIcon(streamerStats.race, streamerStats.rndRace)"
           width="50"
           height="50"
           alt="race"
@@ -22,7 +22,7 @@
       <div>VS</div>
       <div class="race-icon">
         <img
-          :src="getRaceIcon(opponentStats.race)"
+          :src="getRaceIcon(opponentStats.race, opponentStats.rndRace)"
           width="50"
           height="50"
           alt="race"
@@ -42,15 +42,9 @@
     <div class="winners-mmr-container">
       <div class="mmr-stats">
         <div>
-          {{ streamerStats.oldMmr }} <span class="gray">MMR</span> (<span
-            :style="{
-              color:
-                streamerStats.mmrGain > 0
-                  ? 'var(--color-green)'
-                  : 'var(--color-red)'
-            }"
-            >{{ streamerStats.mmrGain > 0 ? "+" : "" }}{{ streamerStats.mmrGain }}</span
-          >)
+          {{ streamerStats.oldMmr }} <span class="gray">MMR</span> <span
+            :style="{ color: streamerStats.mmrGain > 0 ? 'var(--color-green)' : 'var(--color-red)' }"
+          >({{ streamerStats.mmrGain > 0 ? "+" : "" }}{{ streamerStats.mmrGain }})</span>
         </div>
       </div>
       <div class="winner-icon">
@@ -74,16 +68,9 @@
       </div>
       <div class="mmr-stats">
         <div>
-          {{ opponentStats.oldMmr }} <span class="gray">MMR</span> (<span
-            :style="{
-              color:
-                opponentStats.mmrGain > 0
-                  ? 'var(--color-green)'
-                  : 'var(--color-red)'
-            }"
-            >{{ opponentStats.mmrGain > 0 ? "+" : ""
-            }}{{ opponentStats.mmrGain }}</span
-          >)
+          {{ opponentStats.oldMmr }} <span class="gray">MMR</span> <span
+            :style="{ color: opponentStats.mmrGain > 0 ? 'var(--color-green)' : 'var(--color-red)' }"
+          >({{ opponentStats.mmrGain > 0 ? "+" : "" }}{{ opponentStats.mmrGain }})</span>
         </div>
       </div>
     </div>
@@ -91,7 +78,7 @@
       <div class="heroes-stats-container">
         <div class="heroes-stats heroes-stats__left">
           <div
-            v-for="[i, hero] of streamerScores.heroes.reverse().entries()"
+            v-for="[i, hero] of streamerScores.heroes.slice().reverse().entries()"
             :key="i"
             class="hero-icon"
           >
@@ -270,24 +257,22 @@ export default defineComponent({
 
     const state = reactive({ lastMatch: {} as MatchDetail });
     const streamerStats = computed(() => 
-      state.lastMatch.match.teams
+      state.lastMatch?.match?.teams
         .flatMap(team => team.players)
         .find(player => player.battleTag === props.battleTag)!
     );
     const streamerScores = computed(() =>
-      state.lastMatch.playerScores.find(
-        score => score.battleTag === props.battleTag
-      )!
+      state.lastMatch?.playerScores
+        .find(score => score.battleTag === props.battleTag)!
     );
     const opponentStats = computed(() => 
-      state.lastMatch.match.teams
+      state.lastMatch?.match?.teams
         .flatMap(team => team.players)
         .find(player => player.battleTag !== props.battleTag)!
     );
     const opponentScores = computed(() =>
-      state.lastMatch.playerScores.find(
-        score => score.battleTag !== props.battleTag
-      )!
+      state.lastMatch?.playerScores
+        .find(score => score.battleTag !== props.battleTag)!
     );
     const gameDuration = computed(() =>
       formatDuration(
@@ -298,7 +283,6 @@ export default defineComponent({
       )
     );
     const gameDate = computed(() => new Date(state.lastMatch.match.startTime));
-
     const durationMinutes = computed(() => state.lastMatch.match.durationInSeconds / 60);
 
     onMounted(async () => {

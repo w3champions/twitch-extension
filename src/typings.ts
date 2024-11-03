@@ -23,6 +23,7 @@ export enum ERaceEnum {
   UNDEAD = 8,
   TOTAL = 16
 }
+export type ERandomRace = ERaceEnum.HUMAN | ERaceEnum.ORC | ERaceEnum.NIGHT_ELF | ERaceEnum.UNDEAD;
 
 export interface PlayerInTeam {
   oldMmr: number;
@@ -31,6 +32,7 @@ export interface PlayerInTeam {
   name: string;
   mmrGain: number;
   race: ERaceEnum;
+  rndRace: ERandomRace | null;
   won: boolean;
   location?: string;
   countryCode?: string;
