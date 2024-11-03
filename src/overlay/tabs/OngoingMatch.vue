@@ -120,7 +120,7 @@ import {
   PlayerInTeam
 } from "@/typings";
 import PlayerRanking from "@/components/PlayerRanking.vue";
-import WButton from "@/components/common/WButton.vue";
+import WButton from "@/components/WButton.vue";
 import MatchResult from "@/components/MatchResult.vue";
 import RecentMatch from "@/components/RecentMatch.vue";
 import usePlayerAka from "@/composables/usePlayerAka";

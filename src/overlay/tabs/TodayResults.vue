@@ -49,7 +49,7 @@ import { EGameMode, Match } from "@/typings";
 import { isAfter } from "date-fns/isAfter";
 import MatchResult from "@/components/MatchResult.vue";
 import RecentMatch from "@/components/RecentMatch.vue";
-import WButton from "@/components/common/WButton.vue";
+import WButton from "@/components/WButton.vue";
 
 type Props = {
   streamStartedAt: Date;

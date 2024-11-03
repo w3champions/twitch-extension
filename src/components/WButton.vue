@@ -34,7 +34,7 @@ export default defineComponent({
   color: var(--color-yellow);
   width: 107px;
   height: 28px;
-  background-image: url("../../assets/Button_Blue.png");
+  background-image: url("../assets/Button_Blue.png");
   background-size: contain;
   border: none;
   outline: none;
@@ -42,13 +42,13 @@ export default defineComponent({
   background-color: transparent;
 
   &:hover {
-    background-image: url("../../assets/Button_Blue_Hover.png");
+    background-image: url("../assets/Button_Blue_Hover.png");
   }
 
   &:active,
   &--active,
   &--active:hover {
-    background-image: url("../../assets/Button_Blue_Active.png");
+    background-image: url("../assets/Button_Blue_Active.png");
   }
 }
 </style>

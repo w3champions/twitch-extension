@@ -46,15 +46,15 @@
 
 <script lang="ts">
 import { defineComponent, watch, onMounted, reactive, ref, Ref } from "vue";
-import WButton from "@/components/common/WButton.vue";
+import WButton from "@/components/WButton.vue";
 import { TwitchAuthorizationContext, TwitchContext } from "@/typings";
-import OngoingMatch from "@/components/tabs/OngoingMatch.vue";
+import OngoingMatch from "@/overlay/tabs/OngoingMatch.vue";
 import {
   authorizeWithTwitch,
   fetchSeasons,
   getStreamStatus
 } from "@/utils/fetch";
-import TodayResults from "@/components/tabs/TodayResults.vue";
+import TodayResults from "@/overlay/tabs/TodayResults.vue";
 
 enum Tabs {
   CURRENT_MATCH = "currentMatch",
