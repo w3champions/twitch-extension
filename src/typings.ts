@@ -1,3 +1,5 @@
+import type { heroNames } from "./constants/constants";
+
 export enum Segment {
   Global = "global",
   Developer = "developer",
@@ -21,6 +23,7 @@ export enum ERaceEnum {
   UNDEAD = 8,
   TOTAL = 16
 }
+export type ERandomRace = ERaceEnum.HUMAN | ERaceEnum.ORC | ERaceEnum.NIGHT_ELF | ERaceEnum.UNDEAD;
 
 export interface PlayerInTeam {
   oldMmr: number;
@@ -29,6 +32,7 @@ export interface PlayerInTeam {
   name: string;
   mmrGain: number;
   race: ERaceEnum;
+  rndRace: ERandomRace | null;
   won: boolean;
   location?: string;
   countryCode?: string;
@@ -64,7 +68,7 @@ export enum Gateways {
 export interface Match {
   map: string;
   mapName: string;
-  id: number;
+  id: string;
   durationInSeconds: number;
   number: number;
   startTime: string;
@@ -87,7 +91,7 @@ export interface UnitScore {
 }
 
 export interface Hero {
-  icon: string;
+  icon: keyof typeof heroNames;
   level: number;
 }
 

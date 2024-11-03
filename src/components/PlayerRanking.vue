@@ -1,31 +1,51 @@
 <template>
   <div :class="rootClass">
     <div class="player-ranking__name">
-      <div class="player-ranking__display-name">{{ aka || name }}</div>
-      <div class="player-ranking__as" v-if="aka">as {{ name }}</div>
+      <div class="player-ranking__name__main">
+        <a :href="`https://w3champions.com/player/${encodeURIComponent($props.player.battleTag)}`" target="_blank">{{ aka || $props.player.name }}</a>
+      </div>
+      <div class="player-ranking__name__as" v-if="aka">as {{ $props.player.name }}</div>
     </div>
     <div class="player-ranking__race">
-      <img :src="getRaceIcon(race)" width="50" height="50" />
+      <img :src="raceIcon" width="50" height="50" />
     </div>
 
+    <div v-if="$props.stats.rank !== 0" class="player-ranking__league">
+      {{ leagues[$props.stats.leagueOrder] }} {{ $props.stats.division > 0 ? $props.stats.division : "" }} #{{ $props.stats.rank }}
+    </div>
     <div class="player-ranking__rank">
-      Rank {{ rank }} | <span class="player-ranking__wins">{{ wins }}</span> -
-      <span class="player-ranking__losses">{{ losses }}</span>
+      <span class="player-ranking__wins">{{ $props.stats.wins }}</span>
+      -
+      <span class="player-ranking__losses">{{ $props.stats.losses }}</span>
+      |
+      <span class="player-ranking__winrate">{{ Math.round($props.stats.winrate * 10000) / 100 }} %</span>
     </div>
 
-    <div>MMR: {{ mmr }} | RP: {{ rankingPoints }}</div>
-
+    <div class="player-rp">
+      <div class="player-rp__text">Ranking Points</div>
+      <div class="player-rp__progress">
+        <div class="player-rp__progress__bar" :style="{ width: `${($props.stats.rankingPoints - Math.floor($props.stats.rankingPoints)) * 100}%` }" />
+        <div class="player-rp__progress__level">{{ Math.round($props.stats.rankingPoints) }}</div>
+      </div>
+    </div>
+    
     <div>
-      Win probability:
-      <span :style="{ color: winProbability >= 50 ? 'green' : 'red' }"
-        >{{ winProbability }} %</span
-      >
+      <span class="gray">MMR </span><span>{{ $props.stats.mmr }}</span>
+      |
+      <span class="gray">Top </span>{{ Math.round((1 - $props.stats.quantile) * 1000) / 10 }} %
+    </div>
+    <div>
+      Win probability
+      <span :style="{
+        color: winProbability >= 50 ? 'var(--color-green)' : 'var(--color-red)'
+      }">{{ winProbability }} %</span>
     </div>
   </div>
 </template>
 <script lang="ts">
-import { computed } from "vue";
+import { computed, defineComponent } from "vue";
 import { getRaceIcon } from "@/utils/assets";
+import { ModeStat, PlayerInTeam } from "@/typings";
 
 const leagues = [
   "grandmaster",
@@ -48,54 +68,30 @@ function calculateWinProbability(mmr1: number, mmr2: number): number {
 }
 
 type Props = {
-  name: string;
-  wins: number;
-  losses: number;
-  rank: number;
-  mmr: number;
-  opponentMmr: number;
-  rankingPoints: number;
-  leagueId: number;
+  player: PlayerInTeam;
+  stats: ModeStat;
+  opponent: PlayerInTeam;
+  opponentStats: ModeStat;
   aka: string | undefined;
 };
 
-export default {
+export default defineComponent({
   name: "PlayerRanking",
   props: {
-    name: {
-      type: String,
+    player: {
+      type: Object as () => PlayerInTeam,
       required: true
     },
-    wins: {
-      type: Number,
-      default: 0
-    },
-    losses: {
-      type: Number,
-      default: 0
-    },
-    rank: {
-      type: Number,
-      default: 0
-    },
-    mmr: {
-      type: Number,
-      default: 0
-    },
-    opponentMmr: {
-      type: Number,
-      default: 0
-    },
-    rankingPoints: {
-      type: Number,
-      default: 0
-    },
-    leagueId: {
-      type: Number,
+    stats: {
+      type: Object as () => ModeStat,
       required: true
     },
-    race: {
-      type: Number,
+    opponent: {
+      type: Object as () => PlayerInTeam,
+      required: true
+    },
+    opponentStats: {
+      type: Object as () => ModeStat,
       required: true
     },
     aka: {
@@ -104,15 +100,15 @@ export default {
     }
   },
   setup(props: Props) {
-    const winProbability = computed(() => {
-      return calculateWinProbability(props.mmr, props.opponentMmr);
-    });
+    const winProbability = computed(() => calculateWinProbability(props.stats.mmr, props.opponentStats.mmr));
+    const raceIcon = computed(() => getRaceIcon(props.stats.race));
+
     const rootClass = computed(() => {
       const classes = { "player-ranking": true };
 
-      if (leagues[props.leagueId]) {
+      if (leagues[props.stats.leagueOrder] && props.stats.rank > 0) {
         Object.assign(classes, {
-          [`player-ranking--${leagues[props.leagueId]}`]: true
+          [`player-ranking--${leagues[props.stats.leagueOrder]}`]: true
         });
       }
 
@@ -123,10 +119,11 @@ export default {
       rootClass,
       leagues,
       winProbability,
+      raceIcon,
       getRaceIcon
     };
   }
-};
+});
 </script>
 
 <style lang="scss" scoped>
@@ -138,6 +135,7 @@ export default {
   margin-top: 40px;
   padding: 30px 14px;
   border: 1px solid var(--color-yellow);
+  border-radius: 10px;
 
   &::before {
     content: "";
@@ -151,51 +149,72 @@ export default {
 
   &--grandmaster {
     &::before {
-      background: url("../assets/leagues/grandmaster.png");
+      background: url("/leagues/grandmaster.png");
     }
   }
 
   &--master::before {
-    background: url("../assets/leagues/master.png");
+    background: url("/leagues/master.png");
   }
 
   &--adept::before {
-    background: url("../assets/leagues/adept.png");
+    background: url("/leagues/adept.png");
   }
 
   &--diamond::before {
-    background: url("../assets/leagues/diamond.png");
+    background: url("/leagues/diamond.png");
   }
 
   &--platinum::before {
-    background: url("../assets/leagues/platinum.png");
+    background: url("/leagues/platinum.png");
   }
 
   &--gold::before {
-    background: url("../assets/leagues/gold.png");
+    background: url("/leagues/gold.png");
   }
 
   &--silver::before {
-    background: url("../assets/leagues/silver.png");
+    background: url("/leagues/silver.png");
   }
 
   &--bronze::before {
-    background: url("../assets/leagues/bronze.png");
+    background: url("/leagues/bronze.png");
   }
 
   &--grass::before {
-    background: url("../assets/leagues/grass.png");
+    background: url("/leagues/grass.png");
   }
 
   &__name {
     color: var(--color-yellow);
-    font-size: 24px;
-    height: 55px;
-    overflow: hidden;
+    font-weight: bold;
+    text-overflow: ellipsis;
+
+    a {
+      vertical-align: middle;  
+      text-decoration: none;
+      color: var(--color-yellow);
+      padding: 0 8px;
+      margin: 0 -8px;
+      &:hover {
+        border-radius: 10px;
+        background-color: #4447;
+      }
+    }
+
+    &__main {
+      font-size: 28px;
+    }
+
+    &__as {
+      margin-top: -8px;
+      font-size: 12px;
+    }
   }
 
   &__league {
-    font-size: 16px;
+    font-size: 20px;
+    font-weight: bold;
     text-transform: uppercase;
   }
 
@@ -204,15 +223,54 @@ export default {
   }
 
   &__wins {
-    color: green;
+    color: var(--color-green);
   }
 
   &__losses {
-    color: red;
+    color: var(--color-red);
+  }
+
+  &__winrate {
+    font-size: 16px;
   }
 
   &__as {
     font-size: 12px;
+  }
+
+  .player-rp {
+    &__text {
+      font-size: 12px;
+      color: var(--color-gray);
+    }
+    &__progress {
+      display: inline-block;
+      vertical-align: middle;
+      width: 120px;
+      --progress-height: 25px;
+      height: var(--progress-height);
+      text-align: center;
+      border: 1px white solid;
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+
+      &__bar {
+        --dark-yellow: color-mix(in srgb, var(--color-yellow), black 70%);
+        background: linear-gradient(0deg, var(--dark-yellow), var(--color-yellow), var(--dark-yellow));
+        height: 100%;
+      }
+      &__level {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        line-height: var(--progress-height);
+        font-weight: bold;
+        text-shadow: 2px 0 0 black, -2px 0 0 black, 0 2px 0 black, 0 -2px 0 black, 1px 1px black, -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black;
+      }
+    }
   }
 }
 </style>

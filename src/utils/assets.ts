@@ -1,10 +1,19 @@
-import { ERaceEnum } from "@/typings";
+import { ERaceEnum, ERandomRace } from "@/typings";
 
 export function getAsset(path: string) {
-  return require(`../assets/${path}`);
+  return `./${path}`;
 }
 
-export function getRaceIcon(race: ERaceEnum) {
+export function getRaceIcon(race: ERaceEnum, rndRace?: ERandomRace | null) {
+  if (rndRace) {
+    const randRaceIcon = {
+      [ERaceEnum.HUMAN]: "HUMAN_RANDOM",
+      [ERaceEnum.UNDEAD]: "UNDEAD_RANDOM",
+      [ERaceEnum.ORC]: "ORC_RANDOM",
+      [ERaceEnum.NIGHT_ELF]: "NIGHT_ELF_RANDOM",
+    }[rndRace];
+    return getAsset(`races/${randRaceIcon}.png`);
+  }
   const raceIconName = {
     [ERaceEnum.RANDOM]: "RANDOM",
     [ERaceEnum.HUMAN]: "HUMAN",
@@ -13,6 +22,17 @@ export function getRaceIcon(race: ERaceEnum) {
     [ERaceEnum.NIGHT_ELF]: "NIGHT_ELF",
     [ERaceEnum.TOTAL]: "TOTAL"
   }[race];
-
   return getAsset(`races/${raceIconName}.png`);
+}
+
+export function getHeroIcon(hero: string) {
+  return getAsset(`heroes/${hero}.png`);
+}
+
+export function getStatIcon(icon: string) {
+  return getAsset(`${icon}-icon.png`);
+}
+
+export function getMinimap(map: string) {
+  return getAsset(`maps/${map}.png`);
 }

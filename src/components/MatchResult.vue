@@ -1,37 +1,36 @@
 <template>
   <div v-if="hero && opponent" class="match-result">
-    <span v-if="withOpponentName" style="color: var(--color-yellow)">
-      {{ playerAkas[opponent.battleTag] || opponent.name }}
-      <span v-if="playerAkas[opponent.battleTag]">as {{ opponent.name }}</span>
+    <img :src="getRaceIcon(opponent.race, opponent.rndRace)" width="24" height="24" :style="{'vertical-align': 'middle'}" />
+    <span style="color: var(--color-yellow)">
+      {{ opponentAka || opponent.name }}
+      <span v-if="opponentAka && !akaIsSameAsName"> ({{ opponent.name }})</span>
     </span>
-    on {{ match.mapName }} in
-    {{ formatMatchDuration(match.durationInSeconds) }}
-    &rarr;
+    <span> in {{ formatMatchDuration(match.durationInSeconds) }}</span>
+    <span v-if="headToHead"> on {{ formatMonthDay(match.startTime) }}</span>
+    <span v-if="!headToHead" :style="{ color: mmrChange > 0 ? 'var(--color-green)' : 'var(--color-red)' }">
+      ({{ mmrChange > 0 ? '+' : '' }}{{ mmrChange }})
+    </span>
+    <span v-if="!headToHead" style="display: inline-block;"> <relative-time :time="match.endTime" /></span>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { Match } from "@/typings";
-import intervalToDuration from "date-fns/intervalToDuration";
+import { Match, PlayerInTeam } from "@/typings";
 import usePlayerAka from "@/composables/usePlayerAka";
+import { getRaceIcon } from "@/utils/assets";
+import { formatMatchDuration, formatMonthDay } from "@/utils/time";
+import RelativeTime from "@/components/RelativeTime.vue";
+
 type PropTypes = {
   match: Match;
   battleTag: string;
-  withOpponentName: boolean;
+  headToHead: boolean;
 };
-
-function formatMatchDuration(interval: number): string {
-  const duration = intervalToDuration({ start: 0, end: interval * 1000 });
-  const durations = [duration.minutes, duration.seconds];
-
-  if (duration.hours && duration.hours > 0) durations.unshift(duration.hours);
-
-  return durations.map(duration => String(duration).padStart(2, "0")).join(":");
-}
 
 export default defineComponent({
   name: "MatchResult",
+  components: { RelativeTime },
   props: {
     battleTag: {
       type: String,
@@ -41,17 +40,16 @@ export default defineComponent({
       type: Object as () => Match,
       required: true
     },
-    withOpponentName: {
+    headToHead: {
       type: Boolean,
-      default: true
+      default: false
     }
   },
   async setup(props: PropTypes) {
-    let hero;
-    let opponent;
-    const { fetchPlayerAka, playerAkas } = usePlayerAka();
-    const fetchAkaPromises = [];
+    const { playerAkas } = usePlayerAka();
 
+    let hero: PlayerInTeam | null = null;
+    let opponent: PlayerInTeam | null = null;
     for (const team of props.match.teams) {
       for (const player of team.players) {
         if (player.battleTag === props.battleTag) {
@@ -59,18 +57,25 @@ export default defineComponent({
         } else {
           opponent = player;
         }
-
-        fetchAkaPromises.push(fetchPlayerAka(player.battleTag));
       }
     }
 
-    await Promise.all(fetchAkaPromises);
+    const opponentAka = opponent ? playerAkas[opponent.battleTag] : null;
+    const akaIsSameAsName = opponentAka?.toLocaleLowerCase() === opponent?.name.toLocaleLowerCase();
+
+    const mmrChange = props.match.teams
+      .flatMap(team => team.players)
+      .find(player => player.battleTag === hero?.battleTag)?.mmrGain ?? 0;
 
     return {
       hero,
       opponent,
       formatMatchDuration,
-      playerAkas
+      formatMonthDay,
+      opponentAka,
+      akaIsSameAsName,
+      getRaceIcon,
+      mmrChange,
     };
   }
 });
@@ -79,5 +84,10 @@ export default defineComponent({
 <style lang="scss" scoped>
 .match-result {
   cursor: pointer;
+  padding: 4px 8px;
+}
+.match-result:hover {
+  background-color: #4444;
+  border-radius: 12px;
 }
 </style>

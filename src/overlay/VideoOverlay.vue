@@ -1,7 +1,7 @@
 <template>
   <Transition name="slide-left">
     <button
-      v-if="state.twitchConfig.arePlayerControlsVisible"
+      v-if="$props.alwaysVisible || state.twitchConfig.arePlayerControlsVisible"
       class="overlay-toggle"
       @click="isExtensionVisible = !isExtensionVisible"
     />
@@ -14,15 +14,16 @@
     >
       <button class="close-button" @click="isExtensionVisible = false" />
       <header class="header">
-        <div class="promo"></div>
+        <div class="header-battletag">
+          <a :href="`https://w3champions.com/player/${encodeURIComponent(battleTag)}`" target="_blank">{{ battleTag }}</a>
+        </div>
         <div class="header-tabs">
           <w-button
             v-for="tab in tabs"
             :key="tab"
             :is-active="currentTab === tab"
             @click="currentTab = tab"
-            >{{ tabNames[tab] }}</w-button
-          >
+          >{{ tabNames[tab] }}</w-button>
         </div>
       </header>
 
@@ -44,15 +45,15 @@
 
 <script lang="ts">
 import { defineComponent, watch, onMounted, reactive, ref, Ref } from "vue";
-import WButton from "@/components/common/WButton.vue";
+import WButton from "@/components/WButton.vue";
 import { TwitchAuthorizationContext, TwitchContext } from "@/typings";
-import OngoingMatch from "@/components/tabs/OngoingMatch.vue";
+import OngoingMatch from "@/overlay/tabs/OngoingMatch.vue";
 import {
   authorizeWithTwitch,
   fetchSeasons,
   getStreamStatus
 } from "@/utils/fetch";
-import TodayResults from "@/components/tabs/TodayResults.vue";
+import TodayResults from "@/overlay/tabs/TodayResults.vue";
 
 enum Tabs {
   CURRENT_MATCH = "currentMatch",
@@ -65,12 +66,28 @@ const EXTENSION_WINDOW_SCALE_FACTOR = 0.95;
 export default defineComponent({
   name: "VideoOverlay",
   components: { TodayResults, OngoingMatch, WButton },
-  setup() {
+  props: {
+    battleTag: {
+      type: String,
+      required: false,
+      default: ""
+    },
+    alwaysVisible: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+  },
+  setup(props) {
     const state = reactive({ twitchConfig: {} as TwitchContext });
-    const battleTag = ref("");
     const currentSeason: Ref<number> = ref(0);
-    const streamStartedAt = ref("");
     const scaleFactor = ref(1);
+
+    // Can override with .env.local for testing, otherwise will use the extension's config
+    const battleTag = ref(props.battleTag);
+
+    // Default to 24 hours ago, but will be overwritten by the actual stream start time
+    const streamStartedAt = ref(new Date(new Date().getTime() - (24 * 60 * 60 * 1000)));
 
     const currentTab: Ref<string> = ref(Tabs.CURRENT_MATCH);
     const tabs = [Tabs.CURRENT_MATCH, Tabs.TODAY_RESULTS];
@@ -101,7 +118,9 @@ export default defineComponent({
           const channelStatus = streamStatus.data.find(
             stream => stream.user_id === channelId
           );
-          streamStartedAt.value = channelStatus!.started_at;
+          if (channelStatus) {
+            streamStartedAt.value = new Date(channelStatus.started_at);
+          }
         }
       );
 
@@ -144,9 +163,9 @@ export default defineComponent({
 <style lang="scss">
 html {
   --color-yellow: #ffe033;
-  --color-green: #34c264;
-  --color-red: #bf301f;
-  --color-gray: #83817e;
+  --color-green: #4caf50;
+  --color-red: #ff5252;
+  --color-gray: #aeaeae;
 
   font-family: "Spectral", serif;
 }
@@ -166,7 +185,7 @@ html {
   width: 70px;
   height: 135px;
   margin-top: -67px;
-  background: url("../assets/W3C_TwitchButton.png");
+  background: url("/W3C_TwitchButton.png");
   background-size: contain;
   border: none;
   outline: none;
@@ -178,7 +197,7 @@ html {
   width: 1022px;
   height: 657px;
   position: relative;
-  background: url("../assets/background.webp");
+  background: url("/background.webp");
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 85px 470px;
@@ -194,7 +213,7 @@ html {
   cursor: pointer;
   width: 48px;
   height: 48px;
-  background: url("../assets/exit-button.png");
+  background: url("/exit-button.png");
   background-size: contain;
   position: absolute;
   top: 60px;
@@ -203,7 +222,7 @@ html {
   outline: none;
 
   &:hover {
-    background: url("../assets/exit-button-hover.png");
+    background: url("/exit-button-hover.png");
     background-size: contain;
   }
 }
@@ -270,11 +289,32 @@ html {
 }
 
 .header {
+  position: relative;
   display: grid;
-  grid-template-rows: 1fr 28px;
+  grid-template-rows: repeat(1, minmax(0, 1fr));;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-auto-flow: column;
   grid-row-gap: 15px;
-  padding: 10px 0;
-  background: url("../assets/header-logo-yellow.png") no-repeat center top;
+  padding: 0 0 5px 0;
+  background: url("/header-logo-yellow.png") no-repeat center top;
+}
+
+.header-battletag {
+  display: flex;
+  align-items: center;
+  height: 100%;
+
+  a {
+    vertical-align: middle;
+    font-size: 24px;
+    text-decoration: none;
+    color: var(--color-yellow);
+    padding: 0 8px;
+    &:hover {
+      border-radius: 10px;
+      background-color: #4447;
+    }
+  }
 }
 
 .header-tabs {
@@ -283,5 +323,6 @@ html {
   grid-column-gap: 10px;
   grid-auto-columns: min-content;
   justify-content: center;
+  margin-top: 45px;
 }
 </style>
