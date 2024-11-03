@@ -84,28 +84,28 @@
           >
             <img
               :src="getHeroIcon(hero.icon)"
-              width="48"
-              height="48"
+              width="64"
+              height="64"
               :alt="heroNames[hero.icon]"
             />
-            <span class="hero-level" :class="{'hero-level-large': i === streamerScores.heroes.length - 1}"> {{ hero.level }} </span>
+            <span class="hero-level" :class="{'hero-level__large': i === streamerScores.heroes.length - 1}"> {{ hero.level }} </span>
           </div>
         </div>
-        <div style="text-align: right; margin-right: 30px;">
-          <div>
-            {{ Math.round(streamerScores.heroScore.expGained / durationMinutes) }}
+        <div class="resource-stats resource-stats__left">
+          <div class="resource-stats-line">
+            <span :style="resourceScores.xp.streamerStyle">{{ Math.round(resourceScores.xp.streamer) }}</span>
             <img :src="getStatIcon('plus')" width="16" height="16" :alt="'XP'" style="vertical-align: sub;" />
-            XP/min
+            <span>XP/min</span>
           </div>
-          <div>
-            {{ Math.round(streamerScores.resourceScore.goldCollected / durationMinutes) }}
+          <div class="resource-stats-line">
+            <span :style="resourceScores.gold.streamerStyle">{{ resourceScores.gold.streamer }}</span>
             <img :src="getStatIcon('gold')" width="16" height="16" :alt="'Gold'" style="vertical-align: sub;" />
-            Gold/min
+            <span>Gold/min</span>
           </div>
-          <div>
-            {{ Math.round(streamerScores.resourceScore.lumberCollected / durationMinutes) }}
+          <div class="resource-stats-line">
+            <span :style="resourceScores.lumber.streamerStyle">{{ resourceScores.lumber.streamer }}</span>
             <img :src="getStatIcon('lumber')" width="16" height="16" :alt="'Lumber'" style="vertical-align: sub;" />
-            Lumber/min
+            <span>Lumber/min</span>
           </div>
         </div>
       </div>
@@ -182,41 +182,41 @@
           >
             <img
               :src="getHeroIcon(hero.icon)"
-              width="48"
-              height="48"
+              width="64"
+              height="64"
               :alt="heroNames[hero.icon]"
             />
-            <span class="hero-level" :class="{'hero-level-large': i === 0}"> {{ hero.level }} </span>
+            <span class="hero-level" :class="{'hero-level__large': i === 0}"> {{ hero.level }} </span>
           </div>
         </div>
-        <div style="text-align: left; margin-left: 30px;">
-          <div>
-            XP/min
+        <div class="resource-stats resource-stats__right">
+          <div class="resource-stats-line">
+            <span>XP/min</span>
             <img :src="getStatIcon('plus')" width="16" height="16" :alt="'XP'" style="vertical-align: sub;" />
-            {{ Math.round(opponentScores.heroScore.expGained / durationMinutes) }}
+            <span :style="resourceScores.xp.opponentStyle">{{ resourceScores.xp.opponent }}</span>
           </div>
-          <div>
-            Gold/min
+          <div class="resource-stats-line">
+            <span>Gold/min</span>
             <img :src="getStatIcon('gold')" width="16" height="16" :alt="'Gold'" style="vertical-align: sub;" />
-            {{ Math.round(opponentScores.resourceScore.goldCollected / durationMinutes) }}
+            <span :style="resourceScores.gold.opponentStyle">{{ resourceScores.gold.opponent }}</span>
           </div>
-          <div>
-            Lumber/min
+          <div class="resource-stats-line">
+            <span>Lumber/min</span>
             <img :src="getStatIcon('lumber')" width="16" height="16" :alt="'Lumber'" style="vertical-align: sub;" />
-            {{ Math.round(opponentScores.resourceScore.lumberCollected / durationMinutes) }}
+            <span :style="resourceScores.lumber.opponentStyle">{{ resourceScores.lumber.opponent }}</span>
           </div>
         </div>
       </div>
       <div></div>
       <div class="map-stats">
         <div style="text-align: center">
-          Map: {{ state.lastMatch.match.mapName }}
+          <span class="gray">Map:</span> {{ state.lastMatch.match.mapName }}
         </div>
         <div style="text-align: center">
-          Duration: {{ gameDuration }}
+          <span class="gray">Duration:</span> {{ gameDuration }}
         </div>
         <div style="text-align: center">
-          Start time: {{ gameDate.toLocaleString() }}
+          <span class="gray">Start time:</span> {{ gameDate.toLocaleString() }}
         </div>
       </div>
     </div>
@@ -297,11 +297,44 @@ export default defineComponent({
       }
     });
 
+    const resourceScores = computed(() => {
+      const compareStat = (stat1: number, stat2: number) => {
+        if (stat1 === stat2) return "white";
+        return stat1 > stat2 ? "var(--color-green)" : "var(--color-red)";
+      };
+      const minutes = durationMinutes.value;
+      const streamerHero = streamerScores.value.heroScore;
+      const opponentHero = opponentScores.value.heroScore;
+      const streamerRes = streamerScores.value.resourceScore;
+      const opponentRes = opponentScores.value.resourceScore;
+      return {
+        xp: {
+          streamer: Math.round(streamerHero.expGained / minutes),
+          opponent: Math.round(opponentHero.expGained / minutes),
+          streamerStyle: { color: compareStat(streamerHero.expGained, opponentHero.expGained) },
+          opponentStyle: { color: compareStat(opponentHero.expGained, streamerHero.expGained) },
+        },
+        gold: {
+          streamer: Math.round(streamerRes.goldCollected / minutes),
+          opponent: Math.round(opponentRes.goldCollected / minutes),
+          streamerStyle: { color: compareStat(streamerRes.goldCollected, opponentRes.goldCollected) },
+          opponentStyle: { color: compareStat(opponentRes.goldCollected, streamerRes.goldCollected) },
+        },
+        lumber: {
+          streamer: Math.round(streamerRes.lumberCollected / minutes),
+          opponent: Math.round(opponentRes.lumberCollected / minutes),
+          streamerStyle: { color: compareStat(streamerRes.lumberCollected, opponentRes.lumberCollected) },
+          opponentStyle: { color: compareStat(opponentRes.lumberCollected, streamerRes.lumberCollected) },
+        }
+      };
+    });
+
     return {
       streamerStats,
       streamerScores,
       opponentStats,
       opponentScores,
+      resourceScores,
       gameDuration,
       gameDate,
       state,
@@ -396,14 +429,14 @@ export default defineComponent({
   }
 }
 
-.game-stats-section {
-  margin-bottom: 15px;
+.game-stats {
   display: grid;
-  grid-auto-flow: row;
-  grid-row-gap: 5px;
+  grid-row-gap: 15px;
 
-  &:last-of-type {
-    margin-bottom: 0;
+  .game-stats-section {
+    display: grid;
+    grid-auto-flow: row;
+    grid-row-gap: 6px;
   }
 }
 
@@ -412,48 +445,76 @@ export default defineComponent({
   flex-direction: column;
 }
 
-.heroes-stats {
-  display: grid;
-  grid-auto-flow: column;
-  grid-template-rows: 48px;
-  grid-column-gap: 16px;
-  grid-auto-columns: 48px;
-
-  &__left {
-    justify-content: flex-end;
-    margin-right: 30px;
-  }
-
-  &__right {
-    justify-content: flex-start;
-    margin-left: 30px;
-  }
-}
-
-.hero-icon {
-  position: relative;
-}
-
-.hero-level {
-  position: absolute;
-  bottom: 2px;
-  right: 2px;
-  background: rgb(0.5, 0.5, 0.5, 70%);
-  width: 15px;
-  display: block;
-  font-size: 10px;
-  line-height: 1.2em;
-  font-weight: bold;
-}
-
-.hero-level-large {
-  font-size: 14px;
-}
-
 .heroes-stats-container {
-  display: grid;
-  grid-template-rows: 48px 1fr;
-  grid-row-gap: 20px;
+  .heroes-stats {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-rows: 64px;
+    grid-auto-columns: 64px;
+    grid-column-gap: 16px;
+    height: 132px;
+
+    &__left {
+      justify-content: flex-end;
+      margin-right: 30px;
+    }
+
+    &__right {
+      justify-content: flex-start;
+      margin-left: 30px;
+    }
+
+    .hero-icon {
+      position: relative;
+
+      .hero-level {
+        position: absolute;
+        width: 40px;
+        height: 24px;
+        bottom: -24px;
+        right: 12px;
+        background: rgba(50, 194, 165, .4);
+        clip-path: polygon(0 0, 100% 0, 100% 68%, 50% 100%, 0 68%);
+        display: block;
+        font-size: 18px;
+        line-height: 1.2em;
+
+        &__large {
+          width: 48px;
+          height: 32px;
+          bottom: -32px;
+          right: 8px;
+          font-size: 1.5em;
+        }
+      }
+    }
+  }
+
+  .resource-stats {
+    display: grid;
+    grid-row-gap: 6px;
+    margin-top: 16px;
+    
+    .resource-stats-line {
+      height: 16px;
+      line-height: 1;
+    }
+
+    &__left {
+      text-align: right;
+      margin-right: 30px;
+      img {
+        margin: 0 5px;
+      }
+    }
+    &__right {
+      text-align: left;
+      margin-left: 30px;
+      img {
+        margin: 0 5px;
+      }
+    }
+  }
 }
 
 .race-icon {

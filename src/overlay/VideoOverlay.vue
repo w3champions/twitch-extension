@@ -23,8 +23,7 @@
             :key="tab"
             :is-active="currentTab === tab"
             @click="currentTab = tab"
-            >{{ tabNames[tab] }}</w-button
-          >
+          >{{ tabNames[tab] }}</w-button>
         </div>
       </header>
 
