@@ -50,7 +50,7 @@
       <div class="winner-icon">
         <img
           v-if="streamerStats.won"
-          src="../assets/Crown_Indicator.png"
+          src="/Crown_Indicator.png"
           width="50"
           height="50"
           alt="winner"
@@ -60,7 +60,7 @@
       <div class="winner-icon">
         <img
           v-if="opponentStats.won"
-          src="../assets/Crown_Indicator.png"
+          src="/Crown_Indicator.png"
           width="50"
           height="50"
           alt="winner"

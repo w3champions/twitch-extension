@@ -149,40 +149,40 @@ export default defineComponent({
 
   &--grandmaster {
     &::before {
-      background: url("../assets/leagues/grandmaster.png");
+      background: url("/leagues/grandmaster.png");
     }
   }
 
   &--master::before {
-    background: url("../assets/leagues/master.png");
+    background: url("/leagues/master.png");
   }
 
   &--adept::before {
-    background: url("../assets/leagues/adept.png");
+    background: url("/leagues/adept.png");
   }
 
   &--diamond::before {
-    background: url("../assets/leagues/diamond.png");
+    background: url("/leagues/diamond.png");
   }
 
   &--platinum::before {
-    background: url("../assets/leagues/platinum.png");
+    background: url("/leagues/platinum.png");
   }
 
   &--gold::before {
-    background: url("../assets/leagues/gold.png");
+    background: url("/leagues/gold.png");
   }
 
   &--silver::before {
-    background: url("../assets/leagues/silver.png");
+    background: url("/leagues/silver.png");
   }
 
   &--bronze::before {
-    background: url("../assets/leagues/bronze.png");
+    background: url("/leagues/bronze.png");
   }
 
   &--grass::before {
-    background: url("../assets/leagues/grass.png");
+    background: url("/leagues/grass.png");
   }
 
   &__name {

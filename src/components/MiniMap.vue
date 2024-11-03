@@ -43,7 +43,7 @@ export default defineComponent({
   position: absolute;
   top: 0;
   left: 0;
-  background-image: url("../assets/Map_Frame.png");
+  background-image: url("/Map_Frame.png");
   background-size: contain;
   width: 135px;
   height: 137px;

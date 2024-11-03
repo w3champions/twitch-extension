@@ -12,7 +12,7 @@
     </p>
     <img
       class="config-page__img"
-      src="../assets/battletag.png"
+      src="/battletag.png"
       alt="battle tag"
       width="568"
       height="325"

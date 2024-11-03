@@ -185,7 +185,7 @@ html {
   width: 70px;
   height: 135px;
   margin-top: -67px;
-  background: url("../assets/W3C_TwitchButton.png");
+  background: url("/W3C_TwitchButton.png");
   background-size: contain;
   border: none;
   outline: none;
@@ -197,7 +197,7 @@ html {
   width: 1022px;
   height: 657px;
   position: relative;
-  background: url("../assets/background.webp");
+  background: url("/background.webp");
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 85px 470px;
@@ -213,7 +213,7 @@ html {
   cursor: pointer;
   width: 48px;
   height: 48px;
-  background: url("../assets/exit-button.png");
+  background: url("/exit-button.png");
   background-size: contain;
   position: absolute;
   top: 60px;
@@ -222,7 +222,7 @@ html {
   outline: none;
 
   &:hover {
-    background: url("../assets/exit-button-hover.png");
+    background: url("/exit-button-hover.png");
     background-size: contain;
   }
 }
@@ -296,7 +296,7 @@ html {
   grid-auto-flow: column;
   grid-row-gap: 15px;
   padding: 0 0 5px 0;
-  background: url("../assets/header-logo-yellow.png") no-repeat center top;
+  background: url("/header-logo-yellow.png") no-repeat center top;
 }
 
 .header-battletag {
