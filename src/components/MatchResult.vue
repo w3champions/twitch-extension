@@ -10,7 +10,7 @@
     <span v-if="!headToHead" :style="{ color: mmrChange > 0 ? 'var(--color-green)' : 'var(--color-red)' }">
       ({{ mmrChange > 0 ? '+' : '' }}{{ mmrChange }})
     </span>
-    <span v-if="!headToHead"> <relative-time :time="match.endTime" /></span>
+    <span v-if="!headToHead" style="display: inline-block;"> <relative-time :time="match.endTime" /></span>
   </div>
 </template>
 
