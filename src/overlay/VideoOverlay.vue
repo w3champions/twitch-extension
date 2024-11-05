@@ -220,6 +220,7 @@ html {
   right: 30px;
   border: none;
   outline: none;
+  z-index: 2;
 
   &:hover {
     background: url("/exit-button-hover.png");
@@ -297,6 +298,7 @@ html {
   grid-row-gap: 15px;
   padding: 0 0 5px 0;
   background: url("/header-logo-yellow.png") no-repeat center top;
+  z-index: 1;
 }
 
 .header-battletag {
