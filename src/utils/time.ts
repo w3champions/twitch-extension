@@ -6,14 +6,26 @@ export function formatMatchDuration(interval: number): string {
   if (duration.hours && duration.hours > 0) {
     durations.unshift(duration.hours);
   }
-  return durations.map(duration => String(duration).padStart(2, "0")).join(":");
+  return durations
+    .map((duration) => String(duration).padStart(2, "0"))
+    .join(":");
 }
 
 export function formatMonthDay(time: string | Date): string {
   const date = new Date(time);
   const monthNames = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
   ];
   return `${monthNames[date.getMonth()]} ${date.getDate()}`;
 }

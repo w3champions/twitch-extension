@@ -13,98 +13,135 @@
       :style="{ transform: `scale(${scaleFactor})` }"
     >
       <button class="close-button" @click="isExtensionVisible = false" />
-      <header class="header">
-        <div class="header-battletag">
-          <a :href="`https://w3champions.com/player/${encodeURIComponent(battleTag)}`" target="_blank">{{ battleTag }}</a>
+      <header class="layout-header">
+        <div class="layout-header-battletag">
+          <a
+            :href="`https://w3champions.com/player/${encodeURIComponent(store.battleTag)}`"
+            target="_blank"
+          >{{ store.battleTag }}</a>
         </div>
-        <div class="header-tabs">
+        <div class="layout-header-tabs">
           <w-button
-            v-for="tab in tabs"
-            :key="tab"
-            :is-active="currentTab === tab"
-            @click="currentTab = tab"
-          >{{ tabNames[tab] }}</w-button>
+            :is-active="isActive('/ongoing')"
+            @click="navigateTo('/ongoing')"
+            >Current match</w-button
+          >
+          <w-button
+            :is-active="isActive('/today')"
+            @click="navigateTo('/today')"
+            >Today results</w-button
+          >
         </div>
       </header>
 
-      <OngoingMatch
-        v-if="currentTab === 'currentMatch'"
+      <router-view
+        v-if="currentSeason"
+        :key="currentSeason"
         :battle-tag="battleTag"
         :current-season="currentSeason"
-      />
-
-      <TodayResults
-        v-if="currentTab === 'todayResults'"
-        :battle-tag="battleTag"
-        :stream-started-at="streamStartedAt"
-        :current-season="currentSeason"
-      />
+      ></router-view>
     </div>
   </transition>
 </template>
 
 <script lang="ts">
-import { defineComponent, watch, onMounted, reactive, ref, Ref } from "vue";
+import {
+  defineComponent,
+  watch,
+  onMounted,
+  onBeforeUnmount,
+  reactive,
+  ref,
+  computed,
+} from "vue";
 import WButton from "@/components/WButton.vue";
 import { TwitchAuthorizationContext, TwitchContext } from "@/typings";
-import OngoingMatch from "@/overlay/tabs/OngoingMatch.vue";
-import {
-  authorizeWithTwitch,
-  fetchSeasons,
-  getStreamStatus
-} from "@/utils/fetch";
-import TodayResults from "@/overlay/tabs/TodayResults.vue";
-
-enum Tabs {
-  CURRENT_MATCH = "currentMatch",
-  TODAY_RESULTS = "todayResults"
-}
+import { authorizeWithTwitch, getStreamStatus } from "@/utils/fetch";
+import { useRouter, useRoute } from "vue-router";
+import { useW3CStore } from "@/store/w3c";
+import usePlayerAka from "@/composables/usePlayerAka";
 
 const EXTENSION_DEFAULT_WIDTH = 1022;
 const EXTENSION_WINDOW_SCALE_FACTOR = 0.95;
+const POLLING_INTERVAL = 30000;
 
 export default defineComponent({
   name: "VideoOverlay",
-  components: { TodayResults, OngoingMatch, WButton },
+  components: { WButton },
   props: {
     battleTag: {
       type: String,
       required: false,
-      default: ""
+      default: "",
     },
     alwaysVisible: {
       type: Boolean,
       required: false,
-      default: false
+      default: false,
     },
   },
   setup(props) {
+    const store = useW3CStore();
+    const router = useRouter();
+    const route = useRoute();
+    const { playerAkas, fetchPlayerAka } = usePlayerAka();
+
+    // Initialize battleTag from props if available (e.g. dev mode)
+    if (props.battleTag) {
+      store.setBattleTag(props.battleTag);
+      fetchPlayerAka(props.battleTag);
+    }
+
+    // Computed properties from store
+    const currentSeason = computed(() => store.currentSeason);
+
     const state = reactive({ twitchConfig: {} as TwitchContext });
-    const currentSeason: Ref<number> = ref(0);
     const scaleFactor = ref(1);
 
-    // Can override with .env.local for testing, otherwise will use the extension's config
-    const battleTag = ref(props.battleTag);
-
     // Default to 24 hours ago, but will be overwritten by the actual stream start time
-    const streamStartedAt = ref(new Date(new Date().getTime() - (24 * 60 * 60 * 1000)));
+    // Initial value is already set in store
 
-    const currentTab: Ref<string> = ref(Tabs.CURRENT_MATCH);
-    const tabs = [Tabs.CURRENT_MATCH, Tabs.TODAY_RESULTS];
     const isExtensionVisible = ref(false);
+    const pollingTimer = ref(0);
+
+    const startPolling = () => {
+      if (pollingTimer.value) return;
+
+      // Initial fetch
+      if (store.battleTag && currentSeason.value) {
+        store.fetchOngoingMatch(store.battleTag, currentSeason.value);
+      }
+
+      pollingTimer.value = window.setInterval(() => {
+        if (store.battleTag && currentSeason.value) {
+          store.fetchOngoingMatch(store.battleTag, currentSeason.value);
+        }
+      }, POLLING_INTERVAL);
+    };
+
+    const stopPolling = () => {
+      if (pollingTimer.value) {
+        clearInterval(pollingTimer.value);
+        pollingTimer.value = 0;
+      }
+    };
+
     watch(
       () => isExtensionVisible.value,
-      isVisible => {
+      (isVisible) => {
         if (isVisible) {
-          const extensionWindowWidth = document.getElementsByTagName("html")[0]
-            .offsetWidth;
+          const extensionWindowWidth =
+            document.getElementsByTagName("html")[0].offsetWidth;
           scaleFactor.value = Math.min(
             1,
             (extensionWindowWidth * EXTENSION_WINDOW_SCALE_FACTOR) /
-              EXTENSION_DEFAULT_WIDTH
+              EXTENSION_DEFAULT_WIDTH,
           );
+          startPolling();
+        } else {
+          stopPolling();
         }
-      }
+      },
     );
 
     onMounted(async () => {
@@ -113,50 +150,78 @@ export default defineComponent({
           const token = await authorizeWithTwitch();
           const streamStatus = await getStreamStatus(
             token.access_token,
-            channelId
+            channelId,
           );
           const channelStatus = streamStatus.data.find(
-            stream => stream.user_id === channelId
+            (stream) => stream.user_id === channelId,
           );
           if (channelStatus) {
-            streamStartedAt.value = new Date(channelStatus.started_at);
+            store.setStreamStartedAt(channelStatus.started_at);
           }
-        }
+        },
       );
 
       window.Twitch.ext.configuration.onChanged(() => {
         if (window.Twitch.ext.configuration.broadcaster) {
           const config = JSON.parse(
-            window.Twitch.ext.configuration.broadcaster?.content
+            window.Twitch.ext.configuration.broadcaster?.content,
           );
 
-          battleTag.value = config.battleTag;
+          store.setBattleTag(config.battleTag);
+          fetchPlayerAka(config.battleTag);
+
+          if (isExtensionVisible.value && store.currentSeason) {
+            store.fetchOngoingMatch(store.battleTag, store.currentSeason);
+          }
         }
       });
+
+      // Check for existing broadcaster config and set battleTag
+      if (window.Twitch.ext.configuration.broadcaster) {
+        const config = JSON.parse(
+          window.Twitch.ext.configuration.broadcaster.content,
+        );
+        store.setBattleTag(config.battleTag);
+        fetchPlayerAka(config.battleTag);
+      }
 
       window.Twitch.ext.onContext((ctx: TwitchContext) => {
         state.twitchConfig = ctx;
       });
 
-      const seasons = await fetchSeasons();
-      currentSeason.value = seasons[0].id;
+      const seasons = await store.fetchSeasons();
+      if (seasons.length > 0) {
+        store.setCurrentSeason(seasons[0].id);
+
+        if (isExtensionVisible.value && store.battleTag) {
+          store.fetchOngoingMatch(store.battleTag, store.currentSeason);
+        }
+      }
     });
+
+    onBeforeUnmount(() => {
+      stopPolling();
+    });
+
+    const navigateTo = (path: string) => {
+      router.push({ path });
+    };
+
+    const isActive = (path: string) => {
+      return route.path.startsWith(path);
+    };
 
     return {
       state,
-      battleTag,
       isExtensionVisible,
-      currentTab,
-      tabs,
-      tabNames: {
-        [Tabs.CURRENT_MATCH]: "Current match",
-        [Tabs.TODAY_RESULTS]: "Today results"
-      },
-      streamStartedAt,
       currentSeason,
-      scaleFactor
+      scaleFactor,
+      navigateTo,
+      isActive,
+      store,
+      playerAkas,
     };
-  }
+  },
 });
 </script>
 
@@ -204,7 +269,7 @@ html {
   grid-row-gap: 10px;
   justify-content: center;
   text-align: center;
-  padding: 60px 60px 30px;
+  padding: 60px 30px 30px;
   margin: -8px auto 0;
   transform-origin: top left;
 }
@@ -289,19 +354,20 @@ html {
   }
 }
 
-.header {
+.layout-header {
   position: relative;
   display: grid;
-  grid-template-rows: repeat(1, minmax(0, 1fr));;
+  grid-template-rows: repeat(1, minmax(0, 1fr));
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-auto-flow: column;
   grid-row-gap: 15px;
   padding: 0 0 5px 0;
+  margin: 0 30px;
   background: url("/header-logo-yellow.png") no-repeat center top;
   z-index: 1;
 }
 
-.header-battletag {
+.layout-header-battletag {
   display: flex;
   align-items: center;
   height: 100%;
@@ -319,7 +385,7 @@ html {
   }
 }
 
-.header-tabs {
+.layout-header-tabs {
   display: grid;
   grid-auto-flow: column;
   grid-column-gap: 10px;

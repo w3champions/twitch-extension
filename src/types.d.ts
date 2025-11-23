@@ -13,7 +13,7 @@ export interface TwitchExtension {
     onChanged: (callback: () => void) => void;
   };
   onContext: (
-    callback: (ctx: TwitchContext, changes: string[]) => void
+    callback: (ctx: TwitchContext, changes: string[]) => void,
   ) => void;
   rig: { log: typeof console.log };
 }

@@ -1,6 +1,5 @@
 import { TwitchClientID } from "@/constants/constants";
 import {
-  EGameMode,
   Gateways,
   Match,
   MatchDetail,
@@ -9,7 +8,7 @@ import {
   PlayerProfile,
   Season,
   TwitchStreamResponse,
-  TwitchToken
+  TwitchToken,
 } from "@/typings";
 
 export async function fetchMatchStats(matchId: string): Promise<MatchDetail> {
@@ -21,17 +20,17 @@ export async function fetchMatchStats(matchId: string): Promise<MatchDetail> {
 export async function fetchRecentMatches(
   battleTag: string,
   season: number,
-  pageSize = 1
+  pageSize = 50,
 ): Promise<{ count: number; matches: Match[] }> {
   const encodedBattleTag = encodeURIComponent(battleTag);
-  const url = `https://statistic-service.w3champions.com/api/matches/search?playerId=${encodedBattleTag}&gateway=${Gateways.Europe}&offset=0&pageSize=${pageSize}&season=${season}&gameMode=${EGameMode.GM_1ON1}`;
+  const url = `https://statistic-service.w3champions.com/api/matches/search?playerId=${encodedBattleTag}&gateway=${Gateways.Europe}&offset=0&pageSize=${pageSize}&season=${season}`;
 
   const response = await fetch(url);
   return await response.json();
 }
 
 export async function fetchOngoingMatch(
-  battleTag: string
+  battleTag: string,
 ): Promise<OngoingMatch | null> {
   const encodedBattleTag = encodeURIComponent(battleTag);
   const url = `https://statistic-service.w3champions.com/api/matches/ongoing/${encodedBattleTag}`;
@@ -47,12 +46,12 @@ export async function fetchOngoingMatch(
 
 export async function fetchPlayerStats(
   battleTag: string,
-  season: number
+  season: number,
 ): Promise<ModeStat[]> {
   const response = await fetch(
     `https://statistic-service.w3champions.com/api/players/${encodeURIComponent(
-      battleTag
-    )}/game-mode-stats?gateWay=${Gateways.Europe}&season=${season}`
+      battleTag,
+    )}/game-mode-stats?gateWay=${Gateways.Europe}&season=${season}`,
   );
 
   return await response.json();
@@ -61,7 +60,7 @@ export async function fetchPlayerStats(
 export async function fetchPlayerStatsAgainstOpponent(
   battleTag: string,
   opponentBattleTag: string,
-  season: number
+  season: number,
 ): Promise<{ count: number; matches: Match[] }> {
   const encodedBattleTag = encodeURIComponent(battleTag);
   const encodedOpponentBattleTag = encodeURIComponent(opponentBattleTag);
@@ -72,7 +71,7 @@ export async function fetchPlayerStatsAgainstOpponent(
     opponentId: encodedOpponentBattleTag,
     offset: 0,
     pageSize: 200,
-    season
+    season,
   };
   const queryString = Object.entries(query)
     .map(([key, value]) => `${key}=${value}`)
@@ -89,8 +88,8 @@ export async function authorizeWithTwitch(): Promise<TwitchToken> {
     method: "GET",
     headers: {
       Accept: "application/json",
-      "Content-Type": "application/json"
-    }
+      "Content-Type": "application/json",
+    },
   });
 
   return await response.json();
@@ -98,7 +97,7 @@ export async function authorizeWithTwitch(): Promise<TwitchToken> {
 
 export async function getStreamStatus(
   token: string,
-  twitchUserId: string
+  twitchUserId: string,
 ): Promise<TwitchStreamResponse> {
   const baseUrl = "https://api.twitch.tv";
   const params = `user_id=${twitchUserId}`;
@@ -110,8 +109,8 @@ export async function getStreamStatus(
       Accept: "application/json",
       "Content-Type": "application/json",
       "Client-ID": TwitchClientID,
-      Authorization: `Bearer ${token}`
-    }
+      Authorization: `Bearer ${token}`,
+    },
   });
   return await response.json();
 }
@@ -123,7 +122,7 @@ export async function fetchSeasons(): Promise<Season[]> {
 }
 
 export async function fetchPlayerProfile(
-  battleTag: string
+  battleTag: string,
 ): Promise<PlayerProfile> {
   const encodedBattleTag = encodeURIComponent(battleTag);
   const url = `https://website-backend.w3champions.com/api/players/${encodedBattleTag}`;

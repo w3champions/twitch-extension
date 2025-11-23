@@ -3,22 +3,30 @@
 </template>
 
 <script lang="ts">
-import { formatRelativeTime } from '@/utils/time';
-import { computed, defineComponent, onBeforeUnmount, onMounted, ref } from 'vue';
+import { formatRelativeTime } from "@/utils/time";
+import {
+  computed,
+  defineComponent,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+} from "vue";
 
 export default defineComponent({
   name: "RelativeTime",
   props: {
     time: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   setup(props) {
     const timer = ref(0);
     const time = ref(new Date(props.time));
 
-    const formattedRelativeTime = computed(() => formatRelativeTime(time.value));
+    const formattedRelativeTime = computed(() =>
+      formatRelativeTime(time.value),
+    );
 
     onMounted(() => {
       timer.value = setInterval(() => {
@@ -33,6 +41,6 @@ export default defineComponent({
     return {
       formattedRelativeTime,
     };
-  }
+  },
 });
 </script>

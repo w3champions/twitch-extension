@@ -20,7 +20,7 @@ export function getRaceIcon(race: ERaceEnum, rndRace?: ERandomRace | null) {
     [ERaceEnum.UNDEAD]: "UNDEAD",
     [ERaceEnum.ORC]: "ORC",
     [ERaceEnum.NIGHT_ELF]: "NIGHT_ELF",
-    [ERaceEnum.TOTAL]: "TOTAL"
+    [ERaceEnum.TOTAL]: "TOTAL",
   }[race];
   return getAsset(`races/${raceIconName}.png`);
 }
