@@ -41,7 +41,7 @@
                 }"
               />
               <div class="rp-progress__level">
-                {{ Math.round(stat.rankingPoints) }} RP
+                {{ Math.floor(stat.rankingPoints) }} RP
               </div>
             </div>
           </div>
@@ -49,8 +49,8 @@
           <div class="mmr-row">
             <span class="gray">MMR </span><span>{{ stat.mmr }}</span>
             |
-            <span class="gray">Top </span
-            >{{ Math.round((1 - stat.quantile) * 1000) / 10 }} %
+            <span class="gray">Top </span>
+            {{ formatQuantile(stat.quantile) }} %
           </div>
         </div>
       </div>
@@ -69,6 +69,21 @@ import {
 } from "@/constants/constants";
 import { getRaceIcon } from "@/utils/assets";
 import { useW3CStore } from "@/store/w3c";
+
+function formatQuantile(quantile: number): string {
+  const percentage = (1 - quantile) * 100;
+  let decimals = 1;
+  if (percentage < 0.1 || percentage > 99.9) {
+    decimals = 2;
+  }
+  if (percentage < 0.01 || percentage > 99.99) {
+    decimals = 3;
+  }
+  if (percentage < 0.001 || percentage > 99.999) {
+    decimals = 4;
+  }
+  return (Math.round(percentage * Math.pow(10, decimals)) / Math.pow(10, decimals)).toString();
+}
 
 export default defineComponent({
   name: "NoMatchStats",
@@ -217,6 +232,7 @@ export default defineComponent({
       getRaceIcon,
       getCardClass,
       sortedSeasonalStats,
+      formatQuantile,
     };
   },
 });

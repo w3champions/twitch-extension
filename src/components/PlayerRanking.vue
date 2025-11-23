@@ -43,7 +43,7 @@
             }"
           />
           <div class="player-rp__progress__level">
-            {{ Math.round($props.stats.rankingPoints) }}
+            {{ Math.floor($props.stats.rankingPoints) }}
           </div>
         </div>
       </div>
@@ -51,8 +51,8 @@
       <div>
         <span class="gray">MMR </span><span>{{ $props.stats.mmr }}</span>
         |
-        <span class="gray">Top </span
-        >{{ Math.round((1 - $props.stats.quantile) * 1000) / 10 }} %
+        <span class="gray">Top </span>
+        {{ formatQuantile($props.stats.quantile) }} %
       </div>
       <div v-if="winProbability !== null">
         Win probability
@@ -88,6 +88,21 @@ function calculateWinProbability(mmr1: number, mmr2: number): number {
   const winProbability = (1 / (1 + Math.pow(10, m))) * 100;
 
   return Math.round(winProbability * 100) / 100;
+}
+
+function formatQuantile(quantile: number): string {
+  const percentage = (1 - quantile) * 100;
+  let decimals = 1;
+  if (percentage < 0.1 || percentage > 99.9) {
+    decimals = 2;
+  }
+  if (percentage < 0.01 || percentage > 99.99) {
+    decimals = 3;
+  }
+  if (percentage < 0.001 || percentage > 99.999) {
+    decimals = 4;
+  }
+  return (Math.round(percentage * Math.pow(10, decimals)) / Math.pow(10, decimals)).toString();
 }
 
 export default defineComponent({
@@ -144,6 +159,7 @@ export default defineComponent({
       winProbability,
       raceIcon,
       getRaceIcon,
+      formatQuantile,
     };
   },
 });
