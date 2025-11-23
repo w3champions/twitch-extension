@@ -13,14 +13,14 @@ export default defineComponent({
   props: {
     map: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   setup() {
     return {
-      getMinimap
+      getMinimap,
     };
-  }
+  },
 });
 </script>
 <style lang="scss" scoped>

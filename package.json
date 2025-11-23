@@ -7,29 +7,36 @@
     "dev": "vite",
     "build": "rm -rf dist/ && vite build",
     "serve": "vite preview",
-    "packDist": "rm -f dist.zip && yarn build && cd dist/ && zip -r ../dist.zip ./*",
-    "packSrc": "rm -f src.zip && zip -r src.zip src *.html favicon.ico .browserslistrc .eslintignore .eslintrc.js .gitignore package.json README.md tsconfig.json vite.config.js w3champs-live.json yarn.lock",
-    "lint": "eslint --ext .js,.vue,.ts --ignore-path .gitignore --fix src"
+    "packDist": "rm -f dist.zip && npm run build && cd dist/ && zip -r ../dist.zip ./*",
+    "packSrc": "rm -f src.zip && zip -r src.zip src *.html favicon.ico .browserslistrc .eslintignore .eslintrc.js .gitignore package.json package-lock.json README.md tsconfig.json vite.config.js",
+    "lint": "eslint --ext .js,.vue,.ts --ignore-pattern .gitignore --fix src"
   },
   "dependencies": {
     "date-fns": "^4.1.0",
-    "vue": "^3.5.12"
+    "lru-cache": "^11.2.2",
+    "pinia": "^3.0.4",
+    "vue": "^3.5.24",
+    "vue-router": "^4.6.3"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^8.12.2",
-    "@typescript-eslint/parser": "^8.12.2",
-    "@vitejs/plugin-vue": "^5.1.4",
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.39.1",
+    "@typescript-eslint/eslint-plugin": "^8.47.0",
+    "@typescript-eslint/parser": "^8.47.0",
+    "@vitejs/plugin-vue": "^6.0.2",
     "@vue/eslint-config-prettier": "^10.1.0",
-    "@vue/eslint-config-typescript": "^14.1.3",
-    "eslint": "^9.14.0",
-    "eslint-plugin-prettier": "^5.2.1",
-    "eslint-plugin-vue": "^9.30.0",
+    "@vue/eslint-config-typescript": "^14.6.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-vue": "^10.5.1",
+    "globals": "^16.5.0",
     "lint-staged": "^15.2.10",
     "prettier": "^3.3.3",
     "sass": "^1.80.5",
     "typescript": "^5.6.3",
-    "vite": "^5.4.10",
-    "vite-plugin-mkcert": "^1.17.6"
+    "vite": "^7.2.4",
+    "vite-plugin-mkcert": "^1.17.9"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"

@@ -7,12 +7,12 @@ current match and opponent, and recent games played today.
 
 ## Project setup
 ```
-yarn
+npm install
 ```
 
 ### Development
 ```
-yarn dev
+npm run dev
 ```
 
 This will run the app on `https://localhost:8080` (with HTTPS), make sure to
@@ -26,7 +26,7 @@ that appears on the stream, that viewers will see.
 
 For testing, the easiest way I've found:
 - Set up a new version of the extension (if not already done) and set it to "Local Test" mode
-- Run `yarn dev` locally to serve the extension on `https://localhost:8080`
+- Run `npm run dev` locally to serve the extension on `https://localhost:8080`
 - Open the extension in the dashboard at `https://dashboard.twitch.tv/u/{your-username}/extensions/manage` and click the Configure ⚙️ button which opens the `/config` page
 - Edit `config.html` to switch it to run `/src/overlay/index.ts` to test the overlay. (Obviously, don't commit this change.)
 
@@ -39,7 +39,7 @@ VITE_BATTLE_TAG='YourUsername#1234'
 
 ### Build & Ship
 ```
-yarn packDist
+npm run packDist
 ```
 
 This produces the minified build with Vite to `dist/`, then packages it into a zip file
@@ -47,7 +47,7 @@ named `dist.zip` that can be uploaded to Twitch.
 
 ### Lints and fixes files
 ```
-yarn lint
+npm run lint
 ```
 
 ### Customize configuration

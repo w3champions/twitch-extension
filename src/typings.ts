@@ -3,17 +3,70 @@ import type { heroNames } from "./constants/constants";
 export enum Segment {
   Global = "global",
   Developer = "developer",
-  Broadcaster = "broadcaster"
+  Broadcaster = "broadcaster",
 }
 
 export enum EGameMode {
-  UNDEFINED,
+  UNDEFINED = 0,
   GM_1ON1 = 1,
   GM_2ON2 = 2,
-  GM_2ON2_AT = 6,
+  GM_3ON3 = 3,
   GM_4ON4 = 4,
-  GM_FFA = 5
+  GM_FFA = 5,
+  GM_2ON2_AT = 6,
+  GM_3ON3AT = 7,
+  GM_4ON4_AT = 8,
+  GM_CUSTOM = 9,
+
+  GM_1ON1_TOURNAMENT = 11,
+
+  GM_LEGION_4v4_X20 = 202,
+  GM_LEGION_1v1_x20 = 203,
+  GM_LEGION_4v4_X20_AT = 204,
+  GM_LEGION_2v2_X20 = 205,
+
+  GM_ROC_1ON1 = 301,
+
+  GM_LTW_1ON1 = 401,
+  GM_LTW_FFA = 402,
+
+  GM_FROSTCRAFT_4ON4 = 501,
+
+  GM_ATR_1ON1 = 601,
+
+  GM_BANJOBALL_4ON4 = 701,
+
+  GM_PTR_1ON1 = 801,
+
+  GM_DOTA_5ON5 = 901,
+  GM_DOTA_5ON5_AT = 902,
+
+  GM_SC_FFA_4 = 1001,
+  GM_SC_OZ = 1002,
+
+  GM_DS = 1101,
+  GM_DS_AT = 1102,
+
+  GM_WARHAMMER_1ON1 = 1201,
+
+  GM_CF = 1301,
+  GM_CF_AT = 1302,
+
+  GM_RISK_EUROPE_1ON1 = 1401,
+
+  GM_MINIDOTA_3ON3 = 1501,
+  GM_MINIDOTA_3ON3_AT = 1502,
 }
+
+export const AT_EQUIVALENT: { [key: number]: EGameMode } = {
+  [EGameMode.GM_2ON2]: EGameMode.GM_2ON2_AT,
+  [EGameMode.GM_4ON4]: EGameMode.GM_4ON4_AT,
+  [EGameMode.GM_LEGION_4v4_X20]: EGameMode.GM_LEGION_4v4_X20_AT,
+  [EGameMode.GM_DOTA_5ON5]: EGameMode.GM_DOTA_5ON5_AT,
+  [EGameMode.GM_DS]: EGameMode.GM_DS_AT,
+  [EGameMode.GM_CF]: EGameMode.GM_CF_AT,
+  [EGameMode.GM_MINIDOTA_3ON3]: EGameMode.GM_MINIDOTA_3ON3_AT,
+};
 
 export enum ERaceEnum {
   RANDOM = 0,
@@ -21,9 +74,13 @@ export enum ERaceEnum {
   ORC = 2,
   NIGHT_ELF = 4,
   UNDEAD = 8,
-  TOTAL = 16
+  TOTAL = 16,
 }
-export type ERandomRace = ERaceEnum.HUMAN | ERaceEnum.ORC | ERaceEnum.NIGHT_ELF | ERaceEnum.UNDEAD;
+export type ERandomRace =
+  | ERaceEnum.HUMAN
+  | ERaceEnum.ORC
+  | ERaceEnum.NIGHT_ELF
+  | ERaceEnum.UNDEAD;
 
 export interface PlayerInTeam {
   oldMmr: number;
@@ -62,7 +119,7 @@ export interface ServerInfo {
 export enum Gateways {
   America = 10,
   Europe = 20,
-  Asia = 30
+  Asia = 30,
 }
 
 export interface Match {
@@ -131,19 +188,19 @@ export interface TwitchAuthorizationContext {
 export enum HelperMode {
   VIEWER = "viewer",
   DASHBOARD = "dashboard",
-  CONFIG = "config"
+  CONFIG = "config",
 }
 
 export enum HelperPlaybackMode {
   VIDEO = "video",
   AUDIO = "audio",
   REMOTE = "remote",
-  CHAT_ONLY = "chat-only"
+  CHAT_ONLY = "chat-only",
 }
 
 export enum TwitchTheme {
   DARK = "dark",
-  LIGHT = "light"
+  LIGHT = "light",
 }
 
 export interface TwitchContext {

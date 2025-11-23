@@ -25,33 +25,37 @@ export default defineComponent({
   props: {
     stat1: {
       type: Number,
-      required: true
+      required: true,
     },
     icon: {
       type: String,
-      required: true
+      required: true,
     },
     stat2: {
       type: Number,
-      required: true
+      required: true,
     },
     title: {
       type: String,
-      required: true
+      required: true,
     },
     reverse: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   computed: {
     stat1Color(): string {
       if (this.stat1 === this.stat2) return "white";
-      return this.stat1 > this.stat2 ? "var(--color-green)" : "var(--color-red)";
+      return this.stat1 > this.stat2
+        ? "var(--color-green)"
+        : "var(--color-red)";
     },
     stat2Color(): string {
       if (this.stat1 === this.stat2) return "white";
-      return this.stat1 < this.stat2 ? "var(--color-green)" : "var(--color-red)";
+      return this.stat1 < this.stat2
+        ? "var(--color-green)"
+        : "var(--color-red)";
     },
   },
   methods: {

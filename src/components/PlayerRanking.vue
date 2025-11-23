@@ -2,62 +2,85 @@
   <div :class="rootClass">
     <div class="player-ranking__name">
       <div class="player-ranking__name__main">
-        <a :href="`https://w3champions.com/player/${encodeURIComponent($props.player.battleTag)}`" target="_blank">{{ aka || $props.player.name }}</a>
+        <a
+          :href="`https://w3champions.com/player/${encodeURIComponent($props.player.battleTag)}`"
+          target="_blank"
+          >{{ aka || $props.player.name }}</a
+        >
       </div>
-      <div class="player-ranking__name__as" v-if="aka">as {{ $props.player.name }}</div>
+      <div class="player-ranking__name__as" v-if="aka">
+        as {{ $props.player.name }}
+      </div>
     </div>
     <div class="player-ranking__race">
       <img :src="raceIcon" width="50" height="50" />
     </div>
 
-    <div v-if="$props.stats.rank !== 0" class="player-ranking__league">
-      {{ leagues[$props.stats.leagueOrder] }} {{ $props.stats.division > 0 ? $props.stats.division : "" }} #{{ $props.stats.rank }}
-    </div>
-    <div class="player-ranking__rank">
-      <span class="player-ranking__wins">{{ $props.stats.wins }}</span>
-      -
-      <span class="player-ranking__losses">{{ $props.stats.losses }}</span>
-      |
-      <span class="player-ranking__winrate">{{ Math.round($props.stats.winrate * 10000) / 100 }} %</span>
-    </div>
-
-    <div class="player-rp">
-      <div class="player-rp__text">Ranking Points</div>
-      <div class="player-rp__progress">
-        <div class="player-rp__progress__bar" :style="{ width: `${($props.stats.rankingPoints - Math.floor($props.stats.rankingPoints)) * 100}%` }" />
-        <div class="player-rp__progress__level">{{ Math.round($props.stats.rankingPoints) }}</div>
+    <template v-if="$props.stats">
+      <div v-if="$props.stats.rank !== 0" class="player-ranking__league">
+        {{ leagues[$props.stats.leagueOrder] }}
+        {{ $props.stats.division > 0 ? $props.stats.division : "" }} #{{
+          $props.stats.rank
+        }}
       </div>
-    </div>
-    
-    <div>
-      <span class="gray">MMR </span><span>{{ $props.stats.mmr }}</span>
-      |
-      <span class="gray">Top </span>{{ Math.round((1 - $props.stats.quantile) * 1000) / 10 }} %
-    </div>
-    <div>
-      Win probability
-      <span :style="{
-        color: winProbability >= 50 ? 'var(--color-green)' : 'var(--color-red)'
-      }">{{ winProbability }} %</span>
-    </div>
+      <div class="player-ranking__rank">
+        <span class="player-ranking__wins">{{ $props.stats.wins }}</span>
+        -
+        <span class="player-ranking__losses">{{ $props.stats.losses }}</span>
+        |
+        <span class="player-ranking__winrate"
+          >{{ Math.round($props.stats.winrate * 10000) / 100 }} %</span
+        >
+      </div>
+
+      <div class="player-rp">
+        <div class="player-rp__text">Ranking Points</div>
+        <div class="player-rp__progress">
+          <div
+            class="player-rp__progress__bar"
+            :style="{
+              width: `${($props.stats.rankingPoints - Math.floor($props.stats.rankingPoints)) * 100}%`,
+            }"
+          />
+          <div class="player-rp__progress__level">
+            {{ Math.round($props.stats.rankingPoints) }}
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <span class="gray">MMR </span><span>{{ $props.stats.mmr }}</span>
+        |
+        <span class="gray">Top </span
+        >{{ Math.round((1 - $props.stats.quantile) * 1000) / 10 }} %
+      </div>
+      <div v-if="winProbability !== null">
+        Win probability
+        <span
+          :style="{
+            color:
+              winProbability >= 50 ? 'var(--color-green)' : 'var(--color-red)',
+          }"
+          >{{ winProbability }} %</span
+        >
+      </div>
+    </template>
+    <template v-else>
+      <div class="player-ranking__league">Unranked</div>
+      <div class="player-ranking__rank">
+        <span class="player-ranking__wins">0</span>
+        -
+        <span class="player-ranking__losses">0</span>
+      </div>
+      <div><span class="gray">MMR </span><span>-</span></div>
+    </template>
   </div>
 </template>
 <script lang="ts">
-import { computed, defineComponent } from "vue";
+import { computed, defineComponent, PropType } from "vue";
 import { getRaceIcon } from "@/utils/assets";
 import { ModeStat, PlayerInTeam } from "@/typings";
-
-const leagues = [
-  "grandmaster",
-  "master",
-  "adept",
-  "diamond",
-  "platinum",
-  "gold",
-  "silver",
-  "bronze",
-  "grass"
-];
+import { leagues } from "@/constants/constants";
 
 function calculateWinProbability(mmr1: number, mmr2: number): number {
   const m = (mmr2 - mmr1) / 400;
@@ -67,49 +90,49 @@ function calculateWinProbability(mmr1: number, mmr2: number): number {
   return Math.round(winProbability * 100) / 100;
 }
 
-type Props = {
-  player: PlayerInTeam;
-  stats: ModeStat;
-  opponent: PlayerInTeam;
-  opponentStats: ModeStat;
-  aka: string | undefined;
-};
-
 export default defineComponent({
   name: "PlayerRanking",
   props: {
     player: {
-      type: Object as () => PlayerInTeam,
-      required: true
+      type: Object as PropType<PlayerInTeam>,
+      required: true,
     },
     stats: {
-      type: Object as () => ModeStat,
-      required: true
+      type: Object as PropType<ModeStat | null>,
+      default: null,
     },
     opponent: {
-      type: Object as () => PlayerInTeam,
-      required: true
+      type: Object as PropType<PlayerInTeam>,
+      required: true,
     },
     opponentStats: {
-      type: Object as () => ModeStat,
-      required: true
+      type: Object as PropType<ModeStat | null>,
+      default: null,
     },
     aka: {
       type: String,
-      default: ""
-    }
+      default: "",
+    },
   },
-  setup(props: Props) {
-    const winProbability = computed(() => calculateWinProbability(props.stats.mmr, props.opponentStats.mmr));
-    const raceIcon = computed(() => getRaceIcon(props.stats.race));
+  setup(props) {
+    const winProbability = computed(() => {
+      if (!props.stats || !props.opponentStats) return null;
+      return calculateWinProbability(props.stats.mmr, props.opponentStats.mmr);
+    });
+
+    // Use player race if stats are missing (stats.race might be more accurate for random, but player.race is fallback)
+    // Actually player.race is what we have in PlayerInTeam.
+    const raceIcon = computed(() => getRaceIcon(props.player.race));
 
     const rootClass = computed(() => {
-      const classes = { "player-ranking": true };
+      const classes: Record<string, boolean> = { "player-ranking": true };
 
-      if (leagues[props.stats.leagueOrder] && props.stats.rank > 0) {
-        Object.assign(classes, {
-          [`player-ranking--${leagues[props.stats.leagueOrder]}`]: true
-        });
+      if (
+        props.stats &&
+        leagues[props.stats.leagueOrder] &&
+        props.stats.rank > 0
+      ) {
+        classes[`player-ranking--${leagues[props.stats.leagueOrder]}`] = true;
       }
 
       return classes;
@@ -120,9 +143,9 @@ export default defineComponent({
       leagues,
       winProbability,
       raceIcon,
-      getRaceIcon
+      getRaceIcon,
     };
-  }
+  },
 });
 </script>
 
@@ -191,7 +214,7 @@ export default defineComponent({
     text-overflow: ellipsis;
 
     a {
-      vertical-align: middle;  
+      vertical-align: middle;
       text-decoration: none;
       color: var(--color-yellow);
       padding: 0 8px;
@@ -257,7 +280,12 @@ export default defineComponent({
 
       &__bar {
         --dark-yellow: color-mix(in srgb, var(--color-yellow), black 70%);
-        background: linear-gradient(0deg, var(--dark-yellow), var(--color-yellow), var(--dark-yellow));
+        background: linear-gradient(
+          0deg,
+          var(--dark-yellow),
+          var(--color-yellow),
+          var(--dark-yellow)
+        );
         height: 100%;
       }
       &__level {
@@ -268,7 +296,15 @@ export default defineComponent({
         height: 100%;
         line-height: var(--progress-height);
         font-weight: bold;
-        text-shadow: 2px 0 0 black, -2px 0 0 black, 0 2px 0 black, 0 -2px 0 black, 1px 1px black, -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black;
+        text-shadow:
+          2px 0 0 black,
+          -2px 0 0 black,
+          0 2px 0 black,
+          0 -2px 0 black,
+          1px 1px black,
+          -1px -1px 0 black,
+          1px -1px 0 black,
+          -1px 1px 0 black;
       }
     }
   }

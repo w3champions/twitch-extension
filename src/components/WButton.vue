@@ -13,19 +13,19 @@ export default defineComponent({
   props: {
     isActive: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   setup(props) {
     const rootClass = computed(() => ({
       "w-button": true,
-      "w-button--active": props.isActive
+      "w-button--active": props.isActive,
     }));
 
     return {
-      rootClass
+      rootClass,
     };
-  }
+  },
 });
 </script>
 

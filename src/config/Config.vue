@@ -1,8 +1,5 @@
 <template>
   <div class="config-page">
-    <p class="config-page__disclaimer">
-      This extension only supports 1v1 matches.
-    </p>
     <p v-if="battleTagFromConfig" class="config-page__saved-battletag">
       Your saved battle tag is: <strong>{{ battleTagFromConfig }}</strong>
     </p>
@@ -14,8 +11,8 @@
       class="config-page__img"
       src="/battletag.png"
       alt="battle tag"
-      width="568"
-      height="325"
+      width="437"
+      height="250"
     />
     <form @submit.prevent="saveSettings" class="config-page__form">
       <div>
@@ -52,7 +49,7 @@ export default defineComponent({
 
     function saveSettings() {
       const content = JSON.stringify({
-        battleTag: battleTag.value
+        battleTag: battleTag.value,
       });
       window.Twitch.ext.configuration.set(Segment.Broadcaster, "", content);
 
@@ -68,10 +65,11 @@ export default defineComponent({
       window.Twitch.ext.configuration.onChanged(() => {
         if (window.Twitch.ext.configuration.broadcaster) {
           const config = JSON.parse(
-            window.Twitch.ext.configuration.broadcaster?.content
+            window.Twitch.ext.configuration.broadcaster?.content,
           );
 
           battleTagFromConfig.value = config.battleTag;
+          battleTag.value = config.battleTag;
         }
       });
     });
@@ -80,15 +78,17 @@ export default defineComponent({
       battleTagFromConfig,
       battleTag,
       saved,
-      saveSettings
+      saveSettings,
     };
-  }
+  },
 });
 </script>
 
 <style scoped lang="scss">
 .config-page {
   background: white;
+
+  padding: 24px;
 
   &__disclaimer {
     background: #fb755d;
@@ -99,6 +99,7 @@ export default defineComponent({
 
   &__saved-battletag {
     font-size: 20px;
+    margin-top: 0;
     margin-bottom: 25px;
     padding-bottom: 10px;
     border-bottom: 1px solid #83817e;
