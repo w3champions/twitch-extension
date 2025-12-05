@@ -1,3 +1,4 @@
+import { leagues } from "@/constants/constants";
 import { ERaceEnum, ERandomRace } from "@/typings";
 
 export function getAsset(path: string) {
@@ -23,6 +24,11 @@ export function getRaceIcon(race: ERaceEnum, rndRace?: ERandomRace | null) {
     [ERaceEnum.TOTAL]: "TOTAL",
   }[race];
   return getAsset(`races/${raceIconName}.png`);
+}
+
+export function getLeagueIcon(leagueOrder: number) {
+  const league = leagues[leagueOrder];
+  return getAsset(`league/${league}.png`);
 }
 
 export function getHeroIcon(hero: string) {

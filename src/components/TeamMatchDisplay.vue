@@ -129,7 +129,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import { Team, ModeStat, EGameMode } from "@/typings";
-import { getRaceIcon } from "@/utils/assets";
+import { getLeagueIcon, getRaceIcon } from "@/utils/assets";
 import usePlayerAka from "@/composables/usePlayerAka";
 import { leagues, leagueNames, gameModes } from "@/constants/constants";
 
@@ -159,11 +159,6 @@ export default defineComponent({
   },
   setup() {
     const { playerAkas } = usePlayerAka();
-
-    const getLeagueIcon = (leagueOrder: number) => {
-      const leagueName = leagues[leagueOrder];
-      return `/leagues/${leagueName}.png`;
-    };
 
     const getLeagueName = (leagueOrder: number) => {
       const leagueName = leagues[leagueOrder];
